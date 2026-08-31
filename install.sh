@@ -17,7 +17,9 @@ SRC="$(cd "$(dirname "$0")" && pwd)"
 
 run() {
   if [ "$DRY_RUN" -eq 1 ]; then
-    echo "[dry-run] $*"
+    printf '[dry-run]'
+    printf ' %q' "$@"
+    printf '\n'
   else
     "$@"
   fi

@@ -124,6 +124,31 @@ Work ONE lane at a time; the user confirms each before any edit:
    expiries, shared premium quota).
 6. Tell the user: changes apply on the next OpenCode run; restart to apply now.
 
+## Step 6 — Update MODEL_CHOICES.md and MODEL_CHANGELOG.md
+
+After the last lane is confirmed and applied, update the two docs (both live in
+`~/.config/opencode/`, next to `oh-my-opencode-slim.json`):
+
+1. **Rewrite `MODEL_CHOICES.md`** as the new dated snapshot:
+   - Include the **full model ID** (`provider/model`) for every position — every
+     agent chain (primary AND fallback), every council seat, and council
+     synthesis — plus the variant in parentheses when set. Bare short names are
+     not acceptable.
+   - Keep the per-agent rationale fresh: why each model was chosen, evidence
+     cited (benchmarks, community reports, Go-route reliability), and free-tier
+     twin notes.
+   - **Current-state rationale only** — no transition narratives. Do not write
+     "previously ran X, replaced on date Y"; that history belongs in
+     `MODEL_CHANGELOG.md`. Old models may appear only where still
+     decision-relevant (e.g. as the named revert option or tradeoff baseline).
+2. **Update `MODEL_CHANGELOG.md`** (newest-first; never rewrite or delete prior
+   entries — insert the new entry directly below the file header): one entry per
+   refresh, dated, listing each change as
+   `old → new` with full model IDs and variants, the lane affected, and the
+   transition story (why the switch happened, what was gained/lost). This file
+   is the only place transition history lives. If a refresh produces no
+   changes, add a dated "no changes" entry.
+
 ## Source of Truth
 
 Never rely on cached model tables or past baselines (including earlier runs of
