@@ -1,0 +1,26 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "disabled_providers": [
+    "openrouter",
+    "anthropic"
+  ],
+  "permission": {
+    "edit": "ask"
+  },
+  "plugin": [
+    "@tarquinen/opencode-dcp@latest",
+    "opencode-handoff",
+    "oh-my-opencode-slim"
+  ],
+  "agent": {
+    "explore": {
+      "disable": true
+    },
+    "general": {
+      "disable": true
+    }
+  },
+  "lsp": true,
+  "formatter": true,
+  "shell": "/bin/bash"
+}

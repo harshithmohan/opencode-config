@@ -1,0 +1,48 @@
+# --- This project ---
+# Local opencode state (project-level commands/config stay machine-local)
+.opencode/
+
+# --- OS artifacts ---
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+Desktop.ini
+$RECYCLE.BIN/
+# Linux
+*~
+.directory
+.Trash-*
+
+# --- Editors / IDEs ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-*
+
+# --- Secrets / env ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- Logs / temp ---
+*.log
+logs/
+tmp/
+*.tmp
+
+# --- Runtimes (in case the project ever gains scripts) ---
+node_modules/
+__pycache__/
+*.pyc
+.venv/
