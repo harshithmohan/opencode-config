@@ -62,3 +62,7 @@ The config loads three plugins (installed automatically by opencode on first lau
 - Built-in `explore` and `general` agents are disabled in favor of the slim chain.
 
 Config is maintained in this repo.
+
+## Future improvements
+
+- **Custom benchmark suite** — develop my own benchmark harness to evaluate candidate models on the tasks these agents actually perform, rather than relying solely on online benchmarks (Artificial Analysis), community reviews, and Go-route reliability reports. Online signals stay as input, but a private suite scored against real agent workloads (orchestration, code editing, retrieval, tool use) would rank models by what matters here — and catch regressions that public indexes miss.
