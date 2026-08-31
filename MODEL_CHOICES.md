@@ -41,19 +41,17 @@ These constraints drove every decision below:
 
 ## Orchestrator
 
-**Chain:** `glm-5.3-flash (high)` → `deepseek-v4-pro (high)`
+**Chain:** `opencode-go/glm-5.3-flash (high)` → `opencode-go/deepseek-v4-pro (high)`
 📖 [What the Orchestrator does](https://github.com/alvinunreal/oh-my-opencode-slim#01-orchestrator-the-embodiment-of-order)
 
-**Why GLM-5.3-Flash as the daily workhorse:** Previously ran GLM-5.2 (AA Intel 53, 880 req/5h);
-replaced Aug 28 2026 after independent benchmarks confirmed GLM-5.3-Flash is both stronger and
-cheaper. Flash scores AA Intel **57** (level with GPT-5.6 Terra and Muse Spark 1.2, 3 points
-behind GLM-5.3's 60), Terminal-Bench 2.1 **84.3**, DeepSWE v1.1 **63.0** (independent 113-task
-run: 58.4%) — all materially above GLM-5.2. It also has native multimodal (text+image+video+pdf),
+**Why GLM-5.3-Flash as the daily workhorse:** Scores AA Intel **57** (level with GPT-5.6 Terra
+and Muse Spark 1.2, 3 points behind GLM-5.3's 60), Terminal-Bench 2.1 **84.3**, DeepSWE v1.1
+**63.0** (independent 113-task run: 58.4%). It has native multimodal (text+image+video+pdf),
 so the orchestrator reads screenshots directly and the observer lane is no longer needed.
-Economics: 3,160 req/5h (1,580 base × 2× usage multiplier = half cost per call), vs GLM-5.2's
-880 — 3.6× more headroom. Proven in agent harnesses during the ox-alpha/0x-alpha stealth
-preview (~180k–500k users, Claude Code consumed 108–120B tokens on it). Route bugs found and
-fixed: #9963 (xhigh rejection), ollama-cloud family mapping, SGLang thinking degeneration loop.
+Economics: 3,160 req/5h (1,580 base × 2× usage multiplier = half cost per call). Proven in
+agent harnesses during the ox-alpha/0x-alpha stealth preview (~180k–500k users, Claude Code
+consumed 108–120B tokens on it). Route bugs found and fixed: #9963 (xhigh rejection),
+ollama-cloud family mapping, SGLang thinking degeneration loop.
 
 **Tradeoffs accepted:** Slower than GLM-5.2 (50 tok/s vs 69.9, with 90% reasoning tokens making
 responses verbose). CSS/front-end weak. Inconsistent Chinese vs English censorship reported.
@@ -72,7 +70,7 @@ is problematic), `gpt-5.6-luna` for a cheaper non-GLM option.
 
 ## Explorer
 
-**Chain:** `deepseek-v4-flash (high)` → `muse-spark-1.2-contributor (high)`
+**Chain:** `opencode-go/deepseek-v4-flash (high)` → `opencode-go/muse-spark-1.2-contributor (high)`
 📖 [What the Explorer does](https://github.com/alvinunreal/oh-my-opencode-slim#02-explorer-the-eternal-wanderer)
 
 **Why DeepSeek V4 Flash leads:** This lane is "fast, low-cost; speed over reasoning" by
@@ -97,7 +95,7 @@ model, 1M context, same variant map).
 chain preference, not on merit.
 ## Oracle
 
-**Chain:** `deepseek-v4-pro (high)` → `kimi-k2.6`
+**Chain:** `opencode-go/deepseek-v4-pro (high)` → `opencode-go/kimi-k2.6`
 📖 [What the Oracle does](https://github.com/alvinunreal/oh-my-opencode-slim#03-oracle-the-guardian-of-paths)
 
 **Why DeepSeek V4 Pro leads:** Review quality is this lane's whole job. V4 Pro has the best
@@ -117,7 +115,7 @@ for judging evidence.
 
 ## Librarian
 
-**Chain:** `muse-spark-1.2-contributor (high)` → `glm-5.3-flash (high)`
+**Chain:** `opencode-go/muse-spark-1.2-contributor (high)` → `opencode-go/glm-5.3-flash (high)`
 📖 [What the Librarian does](https://github.com/alvinunreal/oh-my-opencode-slim#05-librarian-the-weaver-of-knowledge)
 
 **Why Muse Spark 1.2 leads (unlike Explorer):** Research is network-latency-dominated, so
@@ -146,7 +144,7 @@ censorship becomes problematic at fallback depth.
 or `kimi-k2.7-code` for a more capable research specialist at higher cost.
 ## Designer
 
-**Chain:** `kimi-k3` → `glm-5.3 (high)`
+**Chain:** `opencode-go/kimi-k3` → `opencode-go/glm-5.3 (high)`
 📖 [What the Designer does](https://github.com/alvinunreal/oh-my-opencode-slim#06-designer-the-guardian-of-aesthetics)
 
 **Why Kimi K3 despite premium cost:** This lane rarely fires, so the "best model wins" rule
@@ -165,7 +163,7 @@ current chain with actual Design Arena data in this price class.
 
 ## Fixer
 
-**Chain:** `qwen3.8-flash (high)` → `hy3 (high)`
+**Chain:** `opencode-go/qwen3.8-flash (high)` → `opencode-go/hy3 (high)`
 📖 [What the Fixer does](https://github.com/alvinunreal/oh-my-opencode-slim#07-fixer-the-last-builder)
 
 **Why Qwen3.8 Flash leads (changed from DeepSeek V4 Flash, Aug 28 2026):** Fixer is a
@@ -197,7 +195,7 @@ Flash tool-call issues arise), or `kimi-k2.6` (96.6% tool-invocation reliability
 
 ## Council
 
-**Seats:** alpha=`deepseek-v4-pro` · beta=`glm-5.3` · gamma=`kimi-k3` · synthesis=`qwen3.7-max`
+**Seats:** alpha=`opencode-go/deepseek-v4-pro` · beta=`opencode-go/glm-5.3` · gamma=`opencode-go/kimi-k3` · synthesis=`opencode-go/qwen3.7-max`
 📖 [What the Council does](https://github.com/alvinunreal/oh-my-opencode-slim#04-council-the-chorus-of-minds)
 
 Council needs **distinct strong models across different providers** so a consensus verdict
@@ -222,7 +220,7 @@ Seat models are plain strings (no variants) per plugin schema.
 
 ## Observer *(optional agent — currently disabled)*
 
-**Chain:** `glm-5.3-flash (high)` → `mimo-v2.5`
+**Chain:** `opencode-go/glm-5.3-flash (high)` → `opencode-go/mimo-v2.5`
 📖 [What the Observer does](https://github.com/alvinunreal/oh-my-opencode-slim#observer-the-silent-witness)
 
 **This agent is optional and currently disabled** (`disabled_agents: ["observer"]`). Enable
@@ -262,7 +260,7 @@ blocks with their own prompts and routing rules.
 
 ### Escalation
 
-**Chain:** `glm-5.3 (max)` → `deepseek-v4-pro (max)`
+**Chain:** `opencode-go/glm-5.3 (max)` → `opencode-go/deepseek-v4-pro (max)`
 
 **What it does:** The heavyweight specialist for problems beyond the normal lanes. It handles
 bugs that survived multiple fix attempts, security or data-integrity stakes (auth flows,
@@ -286,7 +284,7 @@ unavailable.
 
 ### Handyman
 
-**Chain:** `hy3 (low)` → `deepseek-v4-flash (low)`
+**Chain:** `opencode-go/hy3 (low)` → `opencode-go/deepseek-v4-flash (low)`
 
 **What it does:** Fast utility worker for mechanical shell/ops tasks — git commits, linting,
 formatting, running project scripts and test suites, bulk file operations (renames, cleanup),

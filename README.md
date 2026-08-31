@@ -4,7 +4,7 @@ My [opencode](https://opencode.ai) configuration, shared for reuse.
 
 This repo is the source of truth for my opencode configuration.
 
-> **📖 Every model choice is reasoned and documented** — see [MODEL_CHOICES.md](MODEL_CHOICES.md) for why each agent runs what it runs: benchmarks, pricing/quota reasoning, Go-route reliability, and fallback logic.
+> **📖 Every model choice is reasoned and documented** — see [MODEL_CHOICES.md](MODEL_CHOICES.md) for why each agent runs what it runs: benchmarks, pricing/quota reasoning, Go-route reliability, and fallback logic. Changes are tracked in [MODEL_CHANGELOG.md](MODEL_CHANGELOG.md) (append-only, one entry per `/model-refresh` run).
 
 ## Prerequisites
 
@@ -22,6 +22,7 @@ config/
 commands/
   model-refresh.md          /model-refresh command — refresh + benchmark-rank model roster
 MODEL_CHOICES.md           Why each agent runs the model it runs (pricing, benchmarks, fallback logic)
+MODEL_CHANGELOG.md         Append-only history of roster changes, one entry per /model-refresh run
 install.sh                  Installer for target systems
 ```
 
