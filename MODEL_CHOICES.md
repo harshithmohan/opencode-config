@@ -5,9 +5,9 @@ Written Aug 2026 against OpenCode Go pricing/availability; benchmarks cited from
 Artificial Analysis (Intelligence Index v4.1.1), community field reports, and Go-route
 reliability testing.
 
-We also checked **OpenCode Zen's free tier** (`opencode/...` provider). Three of the paid
-models below have **exact free twins** there — `muse-spark-1.2-contributor-free`, `hy3-free`,
-and `mimo-v2.5-free` — and each agent section lists them where they apply, so those lanes can
+We also checked **OpenCode Zen's free tier** (`opencode/...` provider). Two of the paid
+models below have **exact free twins** there — `muse-spark-1.2-contributor-free` and
+`mimo-v2.5-free` — and each agent section lists them where they apply, so those lanes can
 be downshifted to zero cost with essentially identical behavior.
 
 ## General principles
@@ -163,34 +163,39 @@ current chain with actual Design Arena data in this price class.
 
 ## Fixer
 
-**Chain:** `opencode-go/qwen3.8-flash (high)` → `opencode-go/hy3 (high)`
+**Chain:** `opencode-go/qwen3.8-flash (medium)` → `opencode-go/deepseek-v4-flash (high)`
 📖 [What the Fixer does](https://github.com/alvinunreal/oh-my-opencode-slim#07-fixer-the-last-builder)
 
-**Why Qwen3.8 Flash leads (changed from DeepSeek V4 Flash, Aug 28 2026):** Fixer is a
-quality-first lane — strength matters more than cost. Qwen3.8 Flash scores AA Intel **56**
-(rank #4/110, measured independently by Artificial Analysis), a meaningful step above DeepSeek
-V4 Flash's 52. Crucially, it's fast: **73.4 tok/s** vs DeepSeek V4 Flash's ~85 tok/s — only
-~15% slower, unlike GLM-5.3-Flash which would have been 41% slower (50 tok/s). At 5,400
-req/5h it has solid quota headroom (vs DeepSeek V4 Flash's 7,600 — only 1.4× more burn).
-Family-diverse from the orchestrator chain (Qwen vs GLM). Multimodal (text+image+video) if
-a fix ever needs to reference a screenshot. Confirmed working on the OpenCode Go route.
+**Why Qwen3.8 Flash leads:** Fixer is a quality-first lane — strength matters more than cost.
+Qwen3.8 Flash scores AA Intel **56** (Qwen3.8-Flash-Next measured independently by Artificial
+Analysis), a meaningful step above DeepSeek V4 Flash's 52. It's fast (73.4 tok/s vs DeepSeek
+V4 Flash's ~85) and at 5,400 req/5h it has solid quota headroom. Family-diverse from the
+orchestrator chain (Qwen vs GLM). Multimodal (text+image+video) if a fix ever needs to
+reference a screenshot.
 
-**Tradeoffs accepted:** No `low` variant — minimum is `high` (budgetTokens 16000), so every
-call burns at high effort. Thinking mode rejects `tool_choice: required`, which may affect
-structured tool calls (degrades to automatic selection). Only 2 days old at time of adoption
-— community validation is thin beyond the AA index. If structured tool-call issues emerge,
-DeepSeek V4 Flash remains a safe revert.
+**Variant choice:** the model's variant map is `low/medium/xhigh` — there is no `high`.
+`medium` is set explicitly: it's the highest effort inside the daily-lane ceiling (policy caps
+daily lanes at `high`, and `xhigh` exceeds it). `max` is additionally broken on the Go route —
+responses truncate at ~20–30 tokens via the Anthropic endpoint (`budgetTokens 31999` →
+`finish: length`,
+[opencode #45987](https://github.com/anomalyco/opencode/issues/45987)) — never use it here.
 
-**Why Hy3 as #2:** The careful-refactor complement — lowest hallucination rate measured
-(5.4%) and <4% behavioral variance across harnesses, with community testers reporting it
-"almost never makes unrequested edits." When a fix touches sensitive code, that trait beats
-raw speed. Family-diverse from the lead (Hy vs Qwen).
+**Why DeepSeek V4 Flash as #2:** AA Intel **52** — enough to rescue tasks the qwen primary
+misses. Fastest model in the cohort (119 tok/s, 1.34s TTFT), SWE-bench Verified 79.0%, 1M
+context, 3x burn tier (fine at fallback frequency). Family-diverse from the lead (DeepSeek vs
+Qwen). Known Go-route wart: rejects `minimum`/`maximum` JSON-Schema keywords in tool
+definitions ([#43378](https://github.com/anomalyco/opencode/issues/43378)) — acceptable at
+fallback depth with the known client-side workaround.
 
-**Free equivalents:** `hy3-free` is the exact free twin of the #2 (same model; 190K vs 256K
-context; drops the `none` variant).
+**Next best alternative:** `opencode-go/glm-5.3-flash (high)` — strongest rescue capability
+(AA 57) but 1.5x burn and the slowest of the cohort at 45 tok/s; it already fronts the
+orchestrator chain. Tradeoff baseline: `opencode-go/hy3` — careful low-edit behavior at the
+6x tier, but open Go-route gates (empty SSE streams
+[#43852](https://github.com/anomalyco/opencode/issues/43852), auto-compaction never triggers
+→ silent 196,608-token cost blowups [#45168](https://github.com/anomalyco/opencode/issues/45168),
+30s–7min time-to-first-token [#44579](https://github.com/anomalyco/opencode/issues/44579))
+keep it out until those are fixed.
 
-**Next best alternative:** `deepseek-v4-flash` (the previous lead — safe revert if Qwen3.8
-Flash tool-call issues arise), or `kimi-k2.6` (96.6% tool-invocation reliability).
 ---
 
 ## Council
@@ -284,21 +289,60 @@ unavailable.
 
 ### Handyman
 
-**Chain:** `opencode-go/hy3 (low)` → `opencode-go/deepseek-v4-flash (low)`
+**Chain:** `opencode-go/mimo-v2.5` → `opencode-go/deepseek-v4-flash (low)`
 
 **What it does:** Fast utility worker for mechanical shell/ops tasks — git commits, linting,
 formatting, running project scripts and test suites, bulk file operations (renames, cleanup),
 build-status checks. Bash-centric work with concise results; it deliberately does not touch
 code logic or architecture (that's Fixer's job).
 
-**Why these models:** Mechanical tasks need reliability and speed, not intelligence — so both
-run at `low` effort. Hy3 leads: sub-cent pricing ($0.0175/$0.0725), careful-by-design behavior
-(lowest hallucination rate of any candidate, 5.4%), and community reports of it following
-shell instructions precisely without unrequested edits. Flash backs it up with the largest
-quota headroom in the catalog. Kept as a separate lane from Fixer so log-heavy ops output
-never pollutes implementation context.
+**Why MiMo V2.5 leads:** Mechanical tasks need reliability and speed, not intelligence. MiMo
+V2.5 sits in the cheapest 6x burn tier ($0.14/$0.28, ~30,100 req/5h — the largest quota
+headroom in the catalog) and passes every Go-route hard gate: healthy streaming, working
+compaction/caching (~71.5k cached tokens/req), and normal latency for tight shell loops.
+Bonus traits: the most concise output of the cohort (lowest verbosity), multimodal image
+input (reads error screenshots), 1M context. Its AA Intel 38 is the weakest of the
+candidates, which is acceptable for mechanical ops. No variant map — run bare, effort
+settings are ignored.
 
-**Free equivalents:** `hy3-free` is the exact free twin of the lead (same model at `low`;
-190K vs 256K context).
+**Why DeepSeek V4 Flash as #2:** 119 tok/s, 1.34s TTFT, AA Intel 52, SWE-bench Verified 79.0%
+— more than enough rescue for shell/ops work at `low` effort, with 3x burn that's fine at
+fallback frequency. Family-diverse from the lead (DeepSeek vs Xiaomi). Known wart: rejects
+`minimum`/`maximum` JSON-Schema keywords in tool definitions
+([#43378](https://github.com/anomalyco/opencode/issues/43378)).
 
-**Next best alternative:** `mimo-v2.5` (Go) — cheapest paid tier, ample for mechanical ops.
+**Free equivalents:** `mimo-v2.5-free` is the exact free twin of the lead (200K vs 1M context).
+
+**Next best alternative:** `opencode-go/qwen3.8-flash (low)` — multimodal and decent, but 3x
+burn buys nothing extra for this lane over MiMo. `opencode-go/hy3` is the tradeoff baseline:
+its Go-route streaming/compaction/latency failures make it a poor
+fit for fast mechanical ops despite the shared 6x tier.
+
+---
+
+## Watch-list
+
+Open items to monitor — revisit on the next `/model-refresh`:
+
+- **deepseek-v4-flash tool-schema rejection** — rejects `minimum`/`maximum` JSON-Schema
+  keywords in tool definitions
+  ([#43378](https://github.com/anomalyco/opencode/issues/43378)). Affects explorer lead,
+  fixer fallback, handyman fallback. If a fix lands, the client-side workaround can be dropped.
+- **qwen3.8-flash `max` variant truncation** — Go route truncates `max`-effort responses at
+  ~20–30 tokens ([#45987](https://github.com/anomalyco/opencode/issues/45987)). Never set
+  `max` on this model; fixer runs `medium` because of it.
+- **hy3 Go-route gates** — empty SSE streams
+  ([#43852](https://github.com/anomalyco/opencode/issues/43852)), auto-compaction never
+  triggers ([#45168](https://github.com/anomalyco/opencode/issues/45168),
+  [#46137](https://github.com/anomalyco/opencode/issues/46137)), extreme TTFT
+  ([#44579](https://github.com/anomalyco/opencode/issues/44579)). If fixed, hy3 becomes
+  viable again as a cheap 6x-tier fallback/handyman candidate.
+- **glm-5.3-flash 2× usage promo is limited-time** — the "2× usage" banner on the Go page is
+  promotional and not reflected in the pricing table ($15 = 1.5x). Recheck before relying on
+  it in quota math (it fronts the orchestrator chain).
+- **hy4-preview not production-ready** — model card admits over-verification; ~86%
+  availability in first field reports; no OpenCode usage data yet. Do not place in any chain
+  until a stable checkpoint and Go-route track record exist.
+- **Shared dollar quota** — the Go pool is combined across all models; premium rare-fire
+  lanes (designer/council/escalation) burn the same pool the daily workhorses draw from.
+  Watch 5h-window exhaustion if heavy designer/council days stack up.

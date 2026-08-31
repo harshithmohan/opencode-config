@@ -56,8 +56,8 @@
       },
       "fixer": {
         "model": [
-          { "id": "opencode-go/qwen3.8-flash", "variant": "high" },
-          { "id": "opencode-go/hy3", "variant": "high" }
+          { "id": "opencode-go/qwen3.8-flash", "variant": "medium" },
+          { "id": "opencode-go/deepseek-v4-flash", "variant": "high" }
         ],
         "skills": [],
         "mcps": []
@@ -93,7 +93,7 @@
   "agents": {
     "handyman": {
       "model": [
-        { "id": "opencode-go/hy3", "variant": "low" },
+        "opencode-go/mimo-v2.5",
         { "id": "opencode-go/deepseek-v4-flash", "variant": "low" }
       ],
       "skills": [],

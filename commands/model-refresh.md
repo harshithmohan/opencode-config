@@ -74,7 +74,10 @@ Verify candidates keep a full working session well under the 5h cap.
 **The Go quota is a combined dollar pool shared across ALL models** — per-model
 req/5h figures are burn rates against the shared cap, not separate budgets. Reason
 in dollar-burn per task for the lane's realistic call volume, not per-model
-request counts.
+request counts. Models may carry a per-model **usage multiplier** (shown in the
+model name, e.g. "GLM-5.3-Flash (2x usage)") that multiplies their req/5h
+allowance — factor it into burn-rate math, and re-verify it per model each
+refresh since it can change.
 
 ## Step 3 — Research: benchmarks + community + route reliability
 
