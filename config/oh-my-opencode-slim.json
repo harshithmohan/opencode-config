@@ -60,7 +60,7 @@
           { "id": "opencode-go/hy3", "variant": "high" }
         ],
         "skills": [],
-        "mcps": ["intellij"]
+        "mcps": []
       },
       "observer": {
         "model": [
@@ -96,7 +96,6 @@
         { "id": "opencode-go/hy3", "variant": "low" },
         { "id": "opencode-go/deepseek-v4-flash", "variant": "low" }
       ],
-      "variant": "low",
       "skills": [],
       "mcps": [],
       "prompt": "You are Handyman, a fast utility specialist for mechanical shell/ops tasks. Your domain is bash-centric work: git commits, linting, code formatting, running project scripts, test suites, and small file operations. You do not edit code logic or architecture — that is for the Fixer. Work quickly and return concise, actionable results.",
