@@ -39,7 +39,7 @@ bunx oh-my-opencode-slim@latest install
 **2. Then install this config:**
 
 ```bash
-git clone <repo-url>
+git clone git@github.com:harshithmohan/opencode-config.git
 cd opencode-config
 ./install.sh
 ```
