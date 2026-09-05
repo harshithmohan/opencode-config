@@ -6,6 +6,35 @@ Append-only history of model assignment changes in
 "no changes" entries); `MODEL_CHOICES.md` holds the current rationale snapshot.
 Never rewrite or delete prior entries.
 
+## 2026-09-05 — Cheap-lane refresh (scope: explorer, librarian, observer only)
+
+Scope-limited run: review and research covered only the three cheap lanes (explorer,
+librarian, observer) per user instruction; all other lanes were left untouched.
+
+- **explorer (fallback):** `opencode-go/muse-spark-1.2-contributor (high)` → `opencode-go/muse-spark-1.3-contributor (high)`
+- **librarian:** no change (`opencode-go/muse-spark-1.2-contributor (high)` → `opencode-go/glm-5.3-flash (high)`)
+- **observer:** no change (still disabled; chain unchanged)
+
+Transition story: Muse Spark 1.3 (released 2026-09-02, same $0.10/$0.20 price and cheapest
+burn class at 45,300 req/5h) is a like-for-like upgrade for codebase recon — AA Intelligence
+61 vs 57, Terminal-Bench 2.1 85% vs 80%, MRCR long-context 98.5% vs 66.3%, and vendor-reported
+20% fewer tool calls / 25% fewer tokens per task. Its regressions (AA-LCR −4, AA-Omniscience
+−3) hit knowledge recall, which is why librarian **held** 1.2: the upgrade case inverts for
+docs research. Explorer keeps DeepSeek V4 Flash as primary (7,600 req/5h, spotless Go record).
+The 1.3 free twin was considered and rejected: it inherits the Muse Go bug class plus a 500
+on `/chat/completions` requiring `/responses` pinning
+([#44659](https://github.com/anomalyco/opencode/issues/44659)), while the paid SKU is already
+sub-cent. Omen Alpha (released 2026-09-04) was evaluated for all three lanes and held/rejected:
+11,600 req/5h makes it quota-cheap (the policy's "premium-burn" label is stale/inverted), but
+it has zero independent benchmarks, an undisclosed vendor, and `low`/`high` variants only.
+Gained: stronger recon fallback at identical cost. Lost: nothing material; watch the
+502-truncation issue ([#2156](https://github.com/anomalyco/opencode/issues/2156)) on large
+sweeps — 1.2 is the named revert option.
+
+Watch-list: Omen Alpha identity reveal + first AA run; Muse 1.3 502 fix (#2156);
+deepseek-v4-flash-vision-exp graduation; glm-5.3-flash 2x promo persistence; MiniMax ban
+re-verification. Full list in `MODEL_CHOICES.md`.
+
 ## 2026-08-31 — hy3 lanes review (usage promotion ended)
 
 Scope: hy3 lanes only (fixer, handyman); all other agents untouched.

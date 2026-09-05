@@ -1,14 +1,14 @@
 # Model Choices — Why Each Agent Runs What It Runs
 
 Reasoning behind every model assignment in [`oh-my-opencode-slim.json`](config/oh-my-opencode-slim.json).
-Written Aug 2026 against OpenCode Go pricing/availability; benchmarks cited from
-Artificial Analysis (Intelligence Index v4.1.1), community field reports, and Go-route
+Written Aug 2026, updated Sep 5 2026 against OpenCode Go pricing/availability; benchmarks cited
+from Artificial Analysis (Intelligence Index v4.1.1), community field reports, and Go-route
 reliability testing.
 
-We also checked **OpenCode Zen's free tier** (`opencode/...` provider). Two of the paid
-models below have **exact free twins** there — `muse-spark-1.2-contributor-free` and
-`mimo-v2.5-free` — and each agent section lists them where they apply, so those lanes can
-be downshifted to zero cost with essentially identical behavior.
+We also checked **OpenCode Zen's free tier** (`opencode/...` provider). Free twins are listed
+where they apply, so those lanes can be downshifted to zero cost with essentially identical
+behavior — though the paid Contributor SKUs are already sub-cent, so the paid entries are kept
+for route stability (see Explorer).
 
 ## General principles
 
@@ -70,29 +70,37 @@ is problematic), `gpt-5.6-luna` for a cheaper non-GLM option.
 
 ## Explorer
 
-**Chain:** `opencode-go/deepseek-v4-flash (high)` → `opencode-go/muse-spark-1.2-contributor (high)`
+**Chain:** `opencode-go/deepseek-v4-flash (high)` → `opencode-go/muse-spark-1.3-contributor (high)`
 📖 [What the Explorer does](https://github.com/alvinunreal/oh-my-opencode-slim#02-explorer-the-eternal-wanderer)
 
 **Why DeepSeek V4 Flash leads:** This lane is "fast, low-cost; speed over reasoning" by
 design. Flash delivers: 394ms TTFT, 122 tok/s, $0.22/$0.66 per 1M, ~7,600 req/5h effective
 burn — yet still scores SWE-V 88.8% / TB 78.6% (ties the much pricier Pro at 47% faster).
 It also has a spotless record on the Go route (0 failures in 357 tracked calls in community
-testing, vs MiniMax failing 10% on the same endpoint).
+testing, vs MiniMax failing 10% on the same endpoint). Text-only is fine: recon is a
+code-reading task, and its fallback covers multimodal cases.
 
-**Why Muse Spark 1.2 Contributor as #2:** At $0.10/$0.20 it adds +5–7 Intelligence points at
-fallback depth (AA live Intel 56.8, Terminal-Bench 80.2%), plus multimodal input if a search
-ever needs it. Known tradeoff accepted here: contributor SKU terms allow training on prompts,
-and p50 TTFT is ~7.7s — tolerable at fallback depth, wrong at lead position.
+**Why Muse Spark 1.3 Contributor as #2 (updated from 1.2, Sep 5 2026):** Same price class
+($0.10/$0.20, 45,300 req/5h — the cheapest burn on the platform) with a clear upgrade:
+AA Intelligence **61 vs 57**, Terminal-Bench 2.1 **85% vs 80%**, MRCR long-context **98.5%
+vs 66.3%** at 256K+ (directly relevant for large codebase sweeps), and vendor-reported
+**20% fewer tool calls / 25% fewer tokens per task** — exactly the recon profile. Known
+regressions (AA-LCR −4, AA-Omniscience −3) hit long-context *knowledge recall*, not codebase
+recon. Contributor SKU terms allow training on prompts — accepted for this cheap lane.
 
-> ⚠️ **Privacy:** the Contributor SKU may train on request data. If that's not ideal for your
-> workloads, don't just demote it — Muse is already #2 in this chain, so remove the entry
-> entirely and let DeepSeek V4 Flash cover the lane solo.
+> ⚠️ **Go-route caveat:** large tool-call sweeps on Muse can 502-truncate mid tool-call
+> ([#2156](https://github.com/anomalyco/opencode/issues/2156), open). Keep explorer sweeps
+> chunked; if it bites in practice, revert the fallback to `opencode-go/muse-spark-1.2-contributor (high)`.
 
-**Free equivalents:** `muse-spark-1.2-contributor-free` is the exact free twin of the #2 (same
-model, 1M context, same variant map).
+**Free equivalent:** `opencode/muse-spark-1.3-contributor-free` is the exact twin (same
+weights, 1M context, same variants). The paid entry is kept deliberately: the free twin
+inherits the same bug class **plus** a 500 on `/chat/completions` requiring `/responses`
+pinning ([#44659](https://github.com/anomalyco/opencode/issues/44659)), and free-tier SKUs
+carry retention risk — saving ~$0.00 per call isn't worth the fragility.
 
-**Next best alternative:** `hy3` — careful, cheap, 256K; it was dropped only for the 2-deep
-chain preference, not on merit.
+**Next best alternative:** `opencode-go/muse-spark-1.2-contributor` (the named revert option,
+still decision-relevant as the tradeoff baseline). `opencode-go/omen-alpha` was evaluated and
+held — see watch-list. `hy3` remains disqualified on Go-route gates.
 ## Oracle
 
 **Chain:** `opencode-go/deepseek-v4-pro (high)` → `opencode-go/kimi-k2.6`
@@ -139,6 +147,11 @@ censorship becomes problematic at fallback depth.
 
 **Free equivalents:** `muse-spark-1.2-contributor-free` is the exact free twin of the lead
 (same model, 1M context, same variants) — the easiest zero-cost swap in this whole config.
+
+**Why NOT Muse Spark 1.3 here (checked Sep 5 2026):** 1.3's gains are coding/agentic; its
+knowledge accuracy *regressed* (AA-Omniscience 45 → 42, DeepSearchQA trails rivals), so the
+upgrade case that won in Explorer inverts for docs research. 1.2 stays until an
+AA-Omniscience rerun shows parity. The 1.3 free twin doesn't apply for the same reason.
 
 **Next best alternative:** `kimi-k2.6` (the previous #2 — still a strong multimodal fallback),
 or `kimi-k2.7-code` for a more capable research specialist at higher cost.
@@ -256,6 +269,15 @@ Note: GLM-5.3-Flash has no free twin.
 at 45,300 req/5h, full multimodal incl audio, but weaker reasoning). Note `hy3` is
 disqualified here — it's text-only, and vision is the whole point of this lane.
 
+**If ever re-enabled (checked Sep 5 2026):** `opencode-go/muse-spark-1.3-contributor` is the
+researched upgrade candidate — cheapest burn of any vision-capable option (45,300 vs
+Vision-Exp's 3,800 req/5h), 1M context, same multimodal set. Gate it on a retest of the
+text→tool stall ([#44659](https://github.com/anomalyco/opencode/issues/44659)) first.
+`opencode-go/omen-alpha` (image input, released Sep 4) was evaluated and **rejected** for
+this lane: no vision benchmarks, `low`/`high` variants only, stealth vendor — highest risk
+exactly for a vision pipeline. `opencode-go/deepseek-v4-flash-vision-exp` is weaker than the
+current chain and carries `-exp` retirement risk with no announced end date.
+
 ---
 
 ## Custom Agents
@@ -324,6 +346,30 @@ fit for fast mechanical ops despite the shared 6x tier.
 
 Open items to monitor — revisit on the next `/model-refresh`:
 
+- **Muse Spark 1.3 502-truncation on large sweeps** — upstream stream ends mid tool-call
+  without terminal signal ([#2156](https://github.com/anomalyco/opencode/issues/2156), open).
+  Affects the explorer fallback. If it bites, revert to `opencode-go/muse-spark-1.2-contributor (high)`.
+- **Omen Alpha (released Sep 4 2026)** — stealth/undisclosed vendor (community leans Zhipu
+  GLM, unconfirmed), **zero independent benchmarks**, `low`/`high` variants only. Despite the
+  policy label, it is NOT premium-burn: 11,600 req/5h / $100 usage — second-cheapest
+  reasoning class. Hold everywhere; re-rate when (a) vendor claims it (watch
+  `opencode.ai/data/unknown/omen-alpha` flip) and (b) first AA Index / TB run lands.
+  Precedent: ox-alpha → GLM-5.3-Flash reveal Aug 26.
+- **deepseek-v4-flash-vision-exp graduation** — experimental, no announced expiry; watch
+  DeepSeek changelog for a non-exp final drop before relying on it anywhere.
+- **hy4-preview window** — no Go expiry stated; no AA benchmarks (unverified); expensive burn
+  (1,350 req/5h). Do not promote until independent data exists.
+- **glm-5.3-flash 2× usage promo** — confirmed still current Sep 5 (1,580 req/5h, $15 usage,
+  halved price). Promo-dependent; recheck the Go docs row before relying on it in quota math.
+- **MiniMax ban stands** — thinking-tag/validation failures on the Go route remain open
+  (#3555, #11439, #18748, #22684, #32580); no closed fix issue as of Sep 5 2026. Keep
+  `opencode-go/minimax-m2.7`/`minimax-m3` out of all chains.
+- **Muse Spark 1.3 `max` variant gating** — launched safety-gated; recheck AA for a
+  standard-price `max` listing (per-task cost rises ~+62% reasoning tokens vs xhigh).
+- **Free-tier retention** — `opencode/nemotron-*-free` marked "limited time"; re-check
+  monthly. Nemotron pair also carries an instruction-following incident flag
+  ([#44225](https://github.com/anomalyco/opencode/issues/44225)) — unsuitable for
+  shell-running agents.
 - **deepseek-v4-flash tool-schema rejection** — rejects `minimum`/`maximum` JSON-Schema
   keywords in tool definitions
   ([#43378](https://github.com/anomalyco/opencode/issues/43378)). Affects explorer lead,
@@ -337,12 +383,6 @@ Open items to monitor — revisit on the next `/model-refresh`:
   [#46137](https://github.com/anomalyco/opencode/issues/46137)), extreme TTFT
   ([#44579](https://github.com/anomalyco/opencode/issues/44579)). If fixed, hy3 becomes
   viable again as a cheap 6x-tier fallback/handyman candidate.
-- **glm-5.3-flash 2× usage promo is limited-time** — the "2× usage" banner on the Go page is
-  promotional and not reflected in the pricing table ($15 = 1.5x). Recheck before relying on
-  it in quota math (it fronts the orchestrator chain).
-- **hy4-preview not production-ready** — model card admits over-verification; ~86%
-  availability in first field reports; no OpenCode usage data yet. Do not place in any chain
-  until a stable checkpoint and Go-route track record exist.
 - **Shared dollar quota** — the Go pool is combined across all models; premium rare-fire
   lanes (designer/council/escalation) burn the same pool the daily workhorses draw from.
   Watch 5h-window exhaustion if heavy designer/council days stack up.

@@ -12,6 +12,8 @@ This repo is the source of truth for my opencode configuration.
 - **[OpenCode Go](https://opencode.ai/go) subscription** — the agent/model roster in `config/oh-my-opencode-slim.json` references the `opencode-go` provider's models. [MODEL_CHOICES.md](MODEL_CHOICES.md) also lists free-tier twins for several models.
 - **[Node.js](https://nodejs.org) or [Bun](https://bun.sh)** — required by the oh-my-opencode-slim installer.
 
+> ⚠️ **Muse models privacy disclaimer** — some roster slots use OpenCode Go's `muse-*` **contributor** models (e.g. `muse-spark-1.2-contributor`, `muse-spark-1.3-contributor`). Data sent through these models **may be used to train them**. If that's unacceptable for your workload (private code, secrets, client work), swap those slots for a non-contributor model in `config/oh-my-opencode-slim.json` — [MODEL_CHOICES.md](MODEL_CHOICES.md) lists the alternatives for every agent.
+
 ## Contents
 
 ```
@@ -39,7 +41,7 @@ bunx oh-my-opencode-slim@latest install
 **2. Then install this config:**
 
 ```bash
-git clone git@github.com:harshithmohan/opencode-config.git
+git clone https://github.com/harshithmohan/opencode-config.git
 cd opencode-config
 ./install.sh
 ```

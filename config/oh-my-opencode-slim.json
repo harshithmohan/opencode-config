@@ -30,7 +30,7 @@
       "explorer": {
         "model": [
           { "id": "opencode-go/deepseek-v4-flash", "variant": "high" },
-          { "id": "opencode-go/muse-spark-1.2-contributor", "variant": "high" }
+          { "id": "opencode-go/muse-spark-1.3-contributor", "variant": "high" }
         ],
         "skills": [],
         "mcps": []
