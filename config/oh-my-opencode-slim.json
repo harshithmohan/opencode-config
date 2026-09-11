@@ -20,7 +20,7 @@
       "oracle": {
         "model": [
           { "id": "opencode-go/deepseek-v4-pro", "variant": "high" },
-          "opencode-go/kimi-k2.6"
+          { "id": "opencode-go/gpt-5.6-luna", "variant": "high" }
         ],
         "skills": [
           "simplify"
@@ -29,7 +29,7 @@
       },
       "explorer": {
         "model": [
-          { "id": "opencode-go/deepseek-v4-flash", "variant": "high" },
+          { "id": "opencode-go/deepseek-v4.1-flash", "variant": "high" },
           { "id": "opencode-go/muse-spark-1.3-contributor", "variant": "high" }
         ],
         "skills": [],
@@ -37,7 +37,7 @@
       },
       "librarian": {
         "model": [
-          { "id": "opencode-go/muse-spark-1.2-contributor", "variant": "high" },
+          { "id": "opencode-go/muse-spark-1.3-contributor", "variant": "high" },
           { "id": "opencode-go/glm-5.3-flash", "variant": "high" }
         ],
         "skills": [],
@@ -48,16 +48,16 @@
       },
       "designer": {
         "model": [
-          "opencode-go/kimi-k3",
-          { "id": "opencode-go/glm-5.3", "variant": "high" }
+          { "id": "opencode-go/glm-5.3-flash", "variant": "high" },
+          { "id": "opencode-go/gpt-5.6-luna", "variant": "high" }
         ],
         "skills": [],
         "mcps": []
       },
       "fixer": {
         "model": [
-          { "id": "opencode-go/qwen3.8-flash", "variant": "medium" },
-          { "id": "opencode-go/deepseek-v4-flash", "variant": "high" }
+          { "id": "opencode-go/deepseek-v4.1-flash", "variant": "high" },
+          { "id": "opencode-go/qwen3.8-flash", "variant": "medium" }
         ],
         "skills": [],
         "mcps": []
@@ -71,7 +71,9 @@
         "mcps": []
       },
       "council": {
-        "model": "opencode-go/qwen3.7-max"
+        "model": [
+          { "id": "opencode-go/gpt-5.6-luna", "variant": "max" }
+        ]
       }
     }
   },
@@ -82,10 +84,10 @@
           "model": "opencode-go/deepseek-v4-pro"
         },
         "beta": {
-          "model": "opencode-go/glm-5.3"
+          "model": "opencode-go/glm-5.3-flash"
         },
         "gamma": {
-          "model": "opencode-go/kimi-k3"
+          "model": "opencode-go/muse-spark-1.3-contributor"
         }
       }
     }
@@ -100,16 +102,6 @@
       "mcps": [],
       "prompt": "You are Handyman, a fast utility specialist for mechanical shell/ops tasks. Your domain is bash-centric work: git commits, linting, code formatting, running project scripts, test suites, and small file operations. You do not edit code logic or architecture — that is for the Fixer. Work quickly and return concise, actionable results.",
       "orchestratorPrompt": "@handyman\n- Lane: Fast utility worker for shell/ops and mechanical tasks\n- Role: Handles git commits, linting, formatting, running scripts, test suites, and small file operations\n- **Delegate when:** User asks to commit changes • linting or formatting code • running test suites • executing project scripts • bulk file operations (renames, cleanup) • checking build status\n- **Don't delegate when:** Code logic changes or implementation • architectural decisions • research or documentation lookup • UI/UX work\n- **Rule of thumb:** Bash-centric mechanical task? → @handyman. Code editing? → @fixer."
-    },
-    "escalation": {
-      "model": [
-        { "id": "opencode-go/glm-5.3", "variant": "max" },
-        { "id": "opencode-go/deepseek-v4-pro", "variant": "max" }
-      ],
-      "skills": [],
-      "mcps": [],
-      "prompt": "You are Escalation, a heavyweight specialist for the hardest problems in the codebase. You are invoked only after the normal lanes have failed or when the stakes are too high for them: bugs that survived multiple fix attempts, security or data-integrity decisions, genuinely uncertain architecture, and cross-system debugging with unclear root cause. You run at maximum reasoning effort — take your time, enumerate hypotheses, verify assumptions against the actual code before concluding, and prefer one correct deep answer over fast shallow ones. Deliver: root-cause analysis with evidence, a concrete plan or patch for the hard core of the problem, and clearly stated residual risks. Do not handle routine implementation, code review, UI work, or research — if a task does not require your depth, say so and name the lane it belongs to.",
-      "orchestratorPrompt": "@escalation\n- Lane: Heavyweight specialist for problems beyond the normal lanes\n- Role: Max-effort root-cause analysis and high-stakes design\n- **Delegate when:** A bug survives 2+ fix attempts • security or data-integrity stakes (auth, migrations, destructive ops) • genuinely uncertain architecture with long-term blast radius • cross-system debugging with unclear root cause after initial investigation\n- **Don't delegate when:** Routine implementation (→ @fixer) • code review or second opinion (→ @oracle) • UI/UX work (→ @designer) • research or docs (→ @librarian) • anything the workhorse chain handles fine\n- **Rule of thumb:** Expensive and slow by design — if you're unsure whether it needs escalation, it probably doesn't."
     }
   }
 }

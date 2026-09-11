@@ -6,6 +6,86 @@ Append-only history of model assignment changes in
 "no changes" entries); `MODEL_CHOICES.md` holds the current rationale snapshot.
 Never rewrite or delete prior entries.
 
+## 2026-09-12 — Escalation agent removed (config + docs)
+
+- **escalation (custom agent): removed** — the `agents.escalation` block
+  (`opencode-go/glm-5.3 (max)` → `opencode-go/deepseek-v4-pro (max)`) was deleted from
+  `oh-my-opencode-slim.json` at user request (agent existed only in this config; it is not a
+  built-in). JSON validated after the edit.
+
+Transition story: the lane was removed by explicit user decision, not by model quality or
+quota findings. Consequences: hard-debug/root-cause work (bugs surviving 2+ fix attempts,
+high-stakes design) now routes to the built-in `@oracle` chain —
+`deepseek-v4-pro (high)` → `gpt-5.6-luna (high)` — instead of a dedicated max-effort lane.
+Gained: a simpler roster; glm-5.3 (the config's only sub-floor model at 220 req/5h) leaves
+every chain. Lost: the guaranteed max-effort heavyweight lane; `@oracle` now absorbs the
+load at `high` effort. Both models remain available in the catalog and in other lanes
+(deepseek-v4-pro still fronts oracle and council alpha), so a future re-add needs no
+availability re-check beyond a normal refresh. If the lane is ever re-created, glm-5.3 (max)
+is the recorded candidate.
+
+Docs synced: `MODEL_CHOICES.md` escalation section removed (handyman is now the only custom
+agent); watch-list escalation sub-floor bullet replaced with a removal note.
+
+## 2026-09-12 — Full 10-lane refresh (all lanes reviewed)
+
+Full-scope run: availability re-diffed via `opencode models opencode-go --verbose`; fresh
+research pass (AA Intelligence Index v4.3, community, Go-route sweep, Estimated Requests
+burn table) via @librarian; every lane reviewed with user confirmation. Burn policy updated
+this run: **burn authority is the req/5h Estimated Requests table
+(opencode.ai/docs/go#estimated-requests), never dollar cost**; **~800 req/5h floor for hot
+lanes** (orchestrator/explorer/librarian/designer/fixer); premium burn only when absolutely
+required and no alternatives exist (designer removed from the rare-fire premium exception;
+even council ended up fully non-premium).
+
+- **oracle (fallback):** `opencode-go/kimi-k2.6` → `opencode-go/gpt-5.6-luna (high)` — K2.6
+  deprecated (AA 31, weakest in config); Luna Pareto-optimal (AA 33 high, CAI 75,
+  2,050 req/5h), family-diverse vs the DeepSeek lead. Lost: nothing material (K2.6 was
+  deprecated, 42 tok/s, 262k ctx).
+- **explorer (primary):** `opencode-go/deepseek-v4-flash (high)` → `opencode-go/deepseek-v4.1-flash (high)`
+  — released 2026-09-10: AA 40, 198.6 tok/s (fastest in config), image input, 4× usage
+  multiplier → 6,500 req/5h. Kept at `high` (v4-family `max`→null wiring gap). Lost:
+  community track record (2 days old).
+- **explorer (fallback):** `opencode-go/muse-spark-1.2-contributor (high)` → `opencode-go/muse-spark-1.3-contributor (high)`
+  — like-for-like upgrade to AA 61 at identical 45,300 req/5h; the Sep 5 hold (knowledge
+  regression) was re-examined and dropped for a query-based research/recon lane.
+- **librarian (primary):** `opencode-go/muse-spark-1.2-contributor (high)` → `opencode-go/muse-spark-1.3-contributor (high)`
+  — same upgrade case: AA 57→61, full multimodal docs reading, unbilletable burn. Privacy
+  tradeoff (prompt training) accepted for this cheap lane.
+- **designer:** `opencode-go/kimi-k3` → `opencode-go/glm-5.3-flash (high)` primary;
+  `opencode-go/glm-5.3 (high)` → `opencode-go/gpt-5.6-luna (high)` fallback — designer became
+  a high-use lane, so the ~800 req/5h floor applies: kimi-k3 (110) and glm-5.3 (220,
+  text-only) both fail it. GLM-5.3-flash (AA 42, vision, 6,320) leads; Luna (AA 33, CAI 75,
+  2,050) backs. Lost: peak UI-generation quality of kimi-k3; gained a lane that can run all
+  day without quota pain.
+- **fixer:** `opencode-go/qwen3.8-flash (medium)` → `opencode-go/deepseek-v4.1-flash (high)` primary;
+  `opencode-go/deepseek-v4-flash (high)` → `opencode-go/qwen3.8-flash (medium)` fallback —
+  user-specified swap; both slots now clear the floor (6,500 / 5,400 req/5h). Qwen demoted
+  for its long-task loops / >90k-ctx crawl; also corrects that it has no `high` variant
+  (`medium` is the daily-lane ceiling). deepseek-v4-flash leaves fixer entirely (remains in
+  handyman fallback).
+- **council (synthesis):** `opencode-go/qwen3.7-max` → `opencode-go/gpt-5.6-luna (max)` —
+  qwen3.7-max deprecated (AA 30, 170 req/5h); Luna max is a single deep synthesis call and
+  2,050 req/5h. The standing premium-synthesis exception ended up unused.
+- **council (beta):** `opencode-go/glm-5.3` → `opencode-go/glm-5.3-flash` — sub-floor burn
+  (220 vs 6,320 req/5h) no longer justified; vision gain for screenshot-judging seats.
+- **council (gamma):** `opencode-go/kimi-k3` → `opencode-go/muse-spark-1.3-contributor` —
+  user explicitly swapped out the last premium seat (110 req/5h) for Muse Spark (AA 61,
+  45,300 req/5h), accepting the prompt-training tradeoff for a manual-only lane.
+- **unchanged:** orchestrator (`glm-5.3-flash (high)` → `deepseek-v4-pro (high)`), observer
+  (disabled; dormant chain `glm-5.3-flash (high)` → `mimo-v2.5` reviewed and confirmed),
+  escalation (`glm-5.3 (max)` → `deepseek-v4-pro (max)`; sub-floor primary accepted as
+  rare-fire tradeoff), handyman (`mimo-v2.5` → `deepseek-v4-flash (low)`).
+
+Gained: every hot lane clears the ~800 req/5h floor; four-family council with zero
+premium-burn models; deprecated models (kimi-k2.6, qwen3.7-max) fully retired from chains.
+Lost: peak single-shot quality at designer/council depth (kimi-k3); community track record
+on the new deepseek-v4.1-flash primary picks. All edits JSON-validated after each lane.
+
+Watch-list: v4.1-flash multiplier/wiring maturity; DSv4 family tool-call text-leak;
+qwen3.8-flash no-`high` + max truncation (#45987); hy4-preview free window ended ~2026-09-11;
+Muse training acceptance scope. Full list in `MODEL_CHOICES.md`.
+
 ## 2026-09-05 — Cheap-lane refresh (scope: explorer, librarian, observer only)
 
 Scope-limited run: review and research covered only the three cheap lanes (explorer,

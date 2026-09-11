@@ -12,6 +12,9 @@
     "opencode-handoff",
     "oh-my-opencode-slim"
   ],
+  "lsp": true,
+  "formatter": true,
+  "shell": "/bin/bash",
   "agent": {
     "explore": {
       "disable": true
@@ -19,8 +22,5 @@
     "general": {
       "disable": true
     }
-  },
-  "lsp": true,
-  "formatter": true,
-  "shell": "/bin/bash"
+  }
 }

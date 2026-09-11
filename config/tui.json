@@ -1,0 +1,10 @@
+{
+  "$schema": "https://opencode.ai/tui.json",
+  "plugin": [
+    "opencode-tps-meter@latest"
+  ],
+  "keybinds": {
+    "app_exit": "ctrl+d,<leader>q",
+    "session_interrupt": "ctrl+c,escape"
+  }
+}
