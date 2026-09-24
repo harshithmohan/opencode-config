@@ -6,6 +6,64 @@ Append-only history of model assignment changes in
 "no changes" entries); `MODEL_CHOICES.md` holds the current rationale snapshot.
 Never rewrite or delete prior entries.
 
+## 2026-09-24 — 9-lane refresh: 5 new Go models onboarded, MiMo experiment lanes
+
+Full-scope run: availability re-diffed via `opencode models opencode-go --verbose` (5 new
+models: gpt-6-luna, grok-4.7, mimo-v2.6-flash, mimo-v2.6-pro, space-bunny-free); fresh
+research pass via @librarian (AA benchmarks, community, Go-route sweep, req/5h burn table —
+all as-of 2026-09-24); every lane reviewed with user confirmation. No removals from the
+catalog; space-bunny-free quarantined (privacy contradiction blocker); grok-4.7 rejected on
+burn cost. deepseek-v4-pro, deepseek-v4-flash, and qwen3.8-flash remain STILL FLAGGED after
+re-verification.
+
+- **orchestrator (fallback):** `opencode-go/deepseek-v4-pro (high)` → `opencode-go/gpt-6-luna (high)`
+  — deepseek-v4-pro is STILL FLAGGED (model-side tool-args-as-text, #1244 open since Apr) and
+  the orchestrator is the max tool-call exposure lane. gpt-6-luna (released 2026-09-22): AA 37
+  (ties 5.6-Luna), route-clean, training Not used, 4,230 req/5h (~2x 5.6-Luna at half price).
+  Gained: quota headroom + distinct family (OpenAI vs Zhipu). Lost: fallback coding strength
+  (CAI 41 vs 5.6's 43, presentation-Elo regressions) — irrelevant at fallback depth.
+  Fixes part of the family-diversity gap (deepseek-v4-pro had been in both orchestrator
+  fallback and oracle lead).
+- **oracle (primary):** `opencode-go/deepseek-v4-pro (high)` → `opencode-go/mimo-v2.6-pro`
+  (plain string — no variant map). **(oracle fallback):** `opencode-go/gpt-5.6-luna (high)` →
+  `opencode-go/deepseek-v4-pro (high)` — gpt-5.6-luna leaves the lane. User chose the
+  MiMo experiment: AA Intelligence 46, top open-weights (1st/114), now natively omnimodal,
+  MIT weights, 3,250 req/5h, privacy Not used/0d. deepseek-v4-pro (still flagged, strongest
+  cached verification evidence) demoted to fallback — tolerable at the oracle's moderate
+  tool exposure. Gained: ~3x verified intelligence jump on the evidence hierarchy at ~1/3
+  of the previous lead's burn; lost: proven coding-agent record (no AA Coding Agent page
+  yet) and a fast first token (TTFT ~17.6s, workload-dependent). Now zero family overlap
+  with the orchestrator chain {Zhipu, OpenAI} vs {Xiaomi, DeepSeek}.
+- **explorer (fallback):** `opencode-go/muse-spark-1.3-contributor (high)` →
+  `opencode-go/mimo-v2.6-flash` (plain string — no variant map) — user chose the privacy-clean
+  (Not used/0d) trial over the higher-AA training SKU: same $0.14/$0.28 class, 30,100 req/5h,
+  vendor TB2.1 87.6. Lost: AA-verified quality (61 vs no AA page) and 45,300 req/5h burn;
+  muse's grep-retry failure shapes also matter in a lane that runs grep/AST sweeps. Primary
+  unchanged.
+- **designer (primary):** `opencode-go/glm-5.3-flash (high)` → `opencode-go/mimo-v2.6-pro`
+  (plain string) — verified quality jump: AA 46 vs 42, omnimodal, 3,250 req/5h clears the
+  hot-lane floor. User accepted the workload-dependent TTFT (~17.6s, AA-measured, not
+  Go-verified). glm-5.3-flash leaves the lane; the recorded revert if TTFT proves annoying
+  in practice. grok-4.7 (premium, 169 req/5h) and gpt-6-luna (CAI + presentation-Elo
+  regressions) rejected for this quality-first hot lane.
+- **handyman (primary):** `opencode-go/mimo-v2.5` → `opencode-go/mimo-v2.6-flash`
+  (plain string) — generational like-for-like upgrade at identical burn (30,100 req/5h,
+  $0.14/$0.28): vendor TB2.1 87.6 vs v2.5's AA 22–38, same multimodal input, privacy
+  Not used/0d. grep-loop failure shapes are shell-irrelevant. Fallback
+  `deepseek-v4-flash (low)` unchanged.
+- **observer (dormant, stays disabled) fallback:** `opencode-go/mimo-v2.5` →
+  `opencode-go/mimo-v2.6-flash` — same gen-upgrade logic in a dormant rescue slot;
+  zero AA verification accepted at that depth. Primary glm-5.3-flash (high) unchanged.
+- **librarian: no changes** — muse-spark-1.3 (AA 61, full multimodal docs reading,
+  45,300 req/5h) beats all candidates including mimo-v2.6-flash on economics + verification.
+- **fixer: no changes** — deepseek-v4.1-flash (high) → qwen3.8-flash (medium); mimo-v2.6-pro
+  promotion deferred to avoid triple MiMo concentration while the oracle/designer experiments
+  bake in; qwen `medium` remains the only variant ceiling safe under both observed variant maps.
+- **council: no changes** — alpha deepseek-v4-pro / beta glm-5.3-flash / gamma
+  muse-spark-1.3-contributor / synthesis gpt-5.6-luna (max); grok-4.7 (the only
+  council-eligible premium) rejected by the user on burn cost; mimo-v2.6-pro recorded as
+  the future candidate after the oracle/designer bake-in.
+
 ## 2026-09-12 — Escalation agent removed (config + docs)
 
 - **escalation (custom agent): removed** — the `agents.escalation` block

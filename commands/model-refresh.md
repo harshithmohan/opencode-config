@@ -70,17 +70,24 @@ date on every write):
 ## User Policy Constraints (do not violate)
 
 1. **Quality-first lanes**: `orchestrator`, `oracle`, `fixer`, `designer` get the
-   strongest models that fit quota; best-in-class over cheapest.
+   strongest models that fit quota — decided on quality per burn (AA score vs
+   req/5h), not raw quality, not raw cheapness. A modest quality gain bought with
+   a disproportionate burn multiple is a bad trade — run the cheaper model and
+   iterate instead; expected cost-per-success is lower. (Only a missing capability
+   like vision or catastrophic-failure risk justifies the pricier model regardless
+   of burn multiple — subject always to #4's ban and floors.)
 2. **Cheap lanes** (`explorer`, `librarian`, `observer`, `handyman`): prefer
    `opencode-go/...` paid models when cost is ~sub-cent per call (hy3,
    muse-spark-contributor class); free-tier (`opencode/...`) acceptable when
    equivalent. Do not pay meaningfully more just to avoid the free tier.
-3. **No local llama.cpp**: never put `llama.cpp/...` models in any chain.
-4. **Premium-burn excluded from daily lanes AND from designer**: reject max-tier
+3. **Provider inclusion**: only consider `opencode-go/...` (paid Go pool) and free zen
+   (`opencode/...`) models for any chain. All other providers are out of scope by default —
+   filter them out of candidate scans before lane review, and do not record them in the
+   availability snapshot or any doc.
+4. **Premium-burn excluded from ALL lanes including council**: reject max-tier
    quota-burn models (Qwen3.8-Max class, Kimi K3, Grok 4.6 class — roughly ≥$2/$6
-   per 1M or top-tier req/5h limits). **Council (genuinely rare-fire) may include
-   at most ONE premium model** — rare call frequency makes the burn acceptable.
-   Hot lanes (`designer`, `fixer` — and any lane found to be used heavily in
+   per 1M or top-tier req/5h limits) everywhere. **Hot lanes
+   (`designer`, `fixer` — and any lane found to be used heavily in
    practice) hold every chain position to a hard floor
    of ~800 requests per 5 hours on the Go pool (GLM-5.3-Flash at 6,320 req/5h is
    the reference minimum; anything materially below that is too much burn even
@@ -89,16 +96,17 @@ date on every write):
    req/5h figures there, never from dollar prices or monthly caps.**
 5. **Family diversity**: avoid the same model family as both primary and fallback
    within a lane, and diversify families across orchestrator vs oracle so a systemic
-   family weakness/outage doesn't hit both lanes.
-6. **Privacy**: Muse Spark Contributor SKUs may train on prompts. Acceptable for
-   cheap lanes per user decision; never propose them for quality-critical lanes.
+   family weakness/outage doesn't hit both lanes. The same model or family appearing
+   in different agents' chains is fine — only the within-lane and orchestrator-vs-oracle
+   rules apply.
+6. **Privacy**: Muse Spark Contributor SKUs may train on prompts — acceptable on ANY lane
+   per user decision (Sep 24 2026); no lane restrictions apply.
 7. **Effort ceilings**: daily lanes are capped at `high`. `max`/`xhigh` variants
    only for complex-task lanes: oracle (when a deep call warrants it) and council.
    (The custom escalation agent was removed Sep 12 2026 — do not re-add it implicitly.)
 8. **Chains are 2-deep by default** — primary + one fallback.
 9. **No model names in prompt text**: agent `prompt`/`orchestratorPrompt` blocks
-   must not name models; the chain definition in config is the only place models
-   appear.
+   must not name models.
 10. **No MiniMax via OpenCode Go**: repeated Go-proxy thinking/tool-call failures
     (HTTP 2013 validation errors, thinking stripped or leaked). Revisit only after
     verified fixes on the Go route.
@@ -108,11 +116,8 @@ date on every write):
     ONLY when the orchestrator chain lacks image input (non-vision) — observer is
     the dedicated multimodal reader. Otherwise leave observer disabled.
 13. **Council**: seats (alpha/beta/gamma) are distinct strong models from distinct
-    families; keep seat `model` values as plain strings. Synthesis may be a premium
-    model as a standing exception — but only when required and no non-premium
-    alternative exists (qwen3.7-max, the original exemplar, is deprecated/retired;
-    current synthesis is non-premium `gpt-5.6-luna (max)`). Council is the only lane
-    where a premium model is permitted (policy #4).
+    families; keep seat `model` values as plain strings. Synthesis is always a
+    non-premium model (current: `gpt-5.6-luna (max)`) (per policy #4, amended Sep 24 2026).
 
 ## Step 1 — Discover current availability and diff against cache
 
@@ -143,13 +148,13 @@ Verify candidates keep a full working session well under the 5h cap.
 **Reuse the cached Quota Economics facts if they are fresh (rule 4 above);
 otherwise re-fetch the doc and update the cache.**
 
-**The Go quota is a combined dollar pool shared across ALL models** — per-model
-req/5h figures are burn rates against the shared cap, not separate budgets. Reason
-in dollar-burn per task for the lane's realistic call volume, not per-model
-request counts. Models may carry a per-model **usage multiplier** (shown in the
-model name, e.g. "GLM-5.3-Flash (2x usage)") that multiplies their req/5h
-allowance — factor it into burn-rate math, and re-verify it per model each
-refresh since it can change.
+**The Go quota is a combined pool shared across ALL models** — per-model
+req/5h figures (Estimated Requests table) are burn rates against the shared cap,
+not separate budgets. Reason from req/5h figures per policy #4, scaled by the
+lane's realistic call volume. Models may carry a per-model **usage multiplier**
+(shown at opencode.ai/go, e.g. DeepSeek V4.1 Flash "4x · Ends Sep 27") that
+multiplies their req/5h allowance — factor it into burn-rate math, and re-verify
+it per model each refresh since it can change.
 
 ## Step 3 — Research: benchmarks + community + route reliability
 

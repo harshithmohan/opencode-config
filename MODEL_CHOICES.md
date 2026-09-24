@@ -1,43 +1,56 @@
 # Model Choices — Why Each Agent Runs What It Runs
 
 Reasoning behind every model assignment in [`oh-my-opencode-slim.json`](config/oh-my-opencode-slim.json).
-Snapshot rewritten Sep 12 2026 from a full 10-lane `/model-refresh`; benchmarks cited from
-Artificial Analysis (Intelligence Index v4.3), community field reports, Go-route reliability
-sweeps, and the OpenCode Go Estimated Requests table (burn authority — see principles).
+Snapshot rewritten Sep 24 2026 from a 9-lane `/model-refresh`; evidence cited from Artificial
+Analysis (Intelligence Index), community field reports, Go-route reliability sweeps, and the
+OpenCode Go Estimated Requests table (burn authority — see principles). Transition history
+lives in [`MODEL_CHANGELOG.md`](./MODEL_CHANGELOG.md); raw findings in
+[`MODEL_EVIDENCE_CACHE.md`](./MODEL_EVIDENCE_CACHE.md).
 
 The **OpenCode Zen free tier** (`opencode/...` provider) is noted where an exact free twin
 exists. Paid Contributor SKUs are already sub-cent, so paid entries are kept for route
-stability.
+stability. **Privacy disclosure:** Contributor SKUs (Muse Spark) may train on prompts —
+usable on any lane per user decision (Sep 24 2026); every Contributor seat in this file
+names its non-training privacy alternative.
 
 ## General principles
 
 1. **Burn authority = the Estimated Requests table** at
    <https://opencode.ai/docs/go#estimated-requests> (req/5h per model). **Never** reason from
    dollar prices or monthly dollar caps — quota economics are request-rate economics on a
-   shared pool. Key rows (as-of 2026-09-12): GLM-5.3-Flash 6,320 · DeepSeek V4.1 Flash 6,500 ·
-   Qwen3.8 Flash 5,400 · Muse Spark 1.2/1.3 45,300 · MiMo V2.5 30,100 · DeepSeek V4 Flash
-   13,000 · Hy3 4,300 · GPT-5.6 Luna 2,050 · DeepSeek V4 Pro 1,050 · Kimi K2.6 1,150 ·
-   Kimi K2.7 Code 1,350 · GLM-5.2 880 · GLM-5.3 220 · Kimi K3 110 · Qwen3.7 Max 170 ·
-   Qwen3.8 Max 160 · Grok 4.6 169 · Hy4 preview 1,350.
+   shared pool. Key rows (as-of 2026-09-24): MiMo-V2.6-Flash 30,100 · MiMo-V2.5 30,100 ·
+   Muse Spark 1.2/1.3 45,300 · DeepSeek V4 Flash 13,000 · LongCat-2.0 11,400 ·
+   DeepSeek V4.1 Flash 26,000 w/ 4x promo (6,500 after Sep 27) · GLM-5.3-Flash 6,320 ·
+   Qwen3.8 Flash 5,400 · GPT-6 Luna 4,230 · MiMo-V2.6-Pro 3,250 · Hy3 4,300 ·
+   Qwen3.7 Plus 4,300 · GPT-5.6 Luna 2,050 · DeepSeek V4 Pro 1,050 · Kimi K2.7 Code 1,350 ·
+   Kimi K2.6 1,150 · GLM-5.2 880 · Grok 4.6/4.7 169 · Qwen3.8 Max 160 · GLM-5.3 220 ·
+   Kimi K3 110.
 2. **Burn floor for hot lanes** — any lane the user actively works through (orchestrator,
    explorer, librarian, designer, fixer) needs ≥~800 req/5h (GLM-5.3-Flash is the reference).
    Sub-floor models are only acceptable where calls are genuinely rare.
-3. **Premium burn only when absolutely required** — no alternatives exist for the role. Even
-   rare-fire lanes should exhaust sub-floor options first; council's premium exception remains
-   in policy but this roster runs fully non-premium.
-4. **Quality-first for judgment lanes** (orchestrator/oracle), **cheap-but-fast for volume
-   lanes** (explorer/librarian/handyman) — sub-cent Contributor SKUs accepted there
-   (privacy tradeoff accepted); never in quality-critical lanes. Every Muse Spark
-   (Contributor) seat in this file names its non-training alternative.
-5. **Effort ceilings** — `high` default everywhere; `max`/`xhigh` only on oracle (when a
-   deep call warrants it) and council synthesis.
+3. **Premium-burn models are excluded from every lane including council** (policy amended
+   Sep 24 2026 — grok-4.7 rejected on burn cost).
+4. **Quality-first for judgment lanes** (orchestrator/oracle/designer/fixer), **cheap-but-fast
+   for volume lanes** (explorer/librarian/handyman) — Contributor SKUs (Muse Spark, which
+   trains on prompts) acceptable on ANY lane per user decision (Sep 24 2026). **Quality is
+   bought efficiently**: on quality per burn (AA score vs req/5h), never raw quality or raw
+   cheapness — a modest quality gain at a disproportionate burn multiple is rejected; run the
+   cheaper model and iterate instead (only a missing capability like vision or
+   catastrophic-failure risk overrides — never the burn floor or premium ban). Every
+   Contributor (training-on-prompts) seat names its non-training privacy alternative.
+5. **Effort ceilings** — `high` default everywhere; `max`/`xhigh` only on oracle (when a deep
+   call warrants it) and council synthesis.
 6. **Two-deep chains** — primary + one fallback, family-diverse within each lane and across
-   orchestrator vs oracle.
-7. **Go-route reliability is a hard gate** — proxy wiring (variants, tool calls, thinking
-   blocks) matters more than raw benchmarks. MiniMax stays banned (HTTP 2013 validation
-   failures, unverified fix). Variant settings are set only where the model's variant map has
-   an entry (e.g. qwen3.8-flash has **no `high`**).
-8. **Evidence hierarchy** — independent benchmarks (AA Intelligence Index v4.3) > community
+   orchestrator vs oracle. The same model/family across different agents' chains is fine.
+   Current cross-check: orchestrator {Zhipu, OpenAI} vs oracle {Xiaomi, DeepSeek} — zero
+   family overlap.
+7. **Provider inclusion + Go-route reliability hard gate** — only `opencode-go/...` (paid Go
+   pool) and free zen (`opencode/...`) models are eligible for any chain; all other providers
+   are out of scope by default (policy amended Sep 24 2026). Proxy wiring
+   (variants, tool calls, thinking blocks) matters more than raw benchmarks. MiniMax stays
+   banned (HTTP 2013 validation failures, unverified fix). Variant settings are set only
+   where the model's variant map has an entry.
+8. **Evidence hierarchy** — independent benchmarks (AA Intelligence Index) > community
    role-specific reports > vendor claims. "No data found" is recorded as unverified, never
    guessed.
 
@@ -45,146 +58,168 @@ stability.
 
 ## Orchestrator
 
-**Chain:** `opencode-go/glm-5.3-flash (high)` → `opencode-go/deepseek-v4-pro (high)`
+**Chain:** `opencode-go/glm-5.3-flash (high)` → `opencode-go/gpt-6-luna (high)`
 📖 [What the Orchestrator does](https://github.com/alvinunreal/oh-my-opencode-slim#01-orchestrator-the-embodiment-of-order)
 
-**Why GLM-5.3-Flash leads (kept Sep 12 2026):** AA Intel **42** (#3/113 Large Open, v4.3),
-94.9 tok/s, and full multimodal input (image+video+pdf) — the orchestrator reads screenshots
-directly, which is why the observer lane stays disabled. **6,320 req/5h** comfortably clears
-the burn floor for the hottest lane. Route-clean in the 2026-09-12 sweep (no Go-route issues
-found). Community verdict is mixed-but-positive: "noticeably better than DSv4 Flash 0731"
-(r/LocalLLaMA 2026-08-28) against known verbosity ("90% of output is thinking", NVIDIA forum
-2026-09-03) and `!!!!!!` loops on very long tasks.
+**Why GLM-5.3-Flash leads:** AA Intel **42** (#3/113 Large Open), 94.9 tok/s, and full
+multimodal input (image+video+pdf) — the orchestrator reads screenshots directly, which is
+why the observer lane stays disabled. **6,320 req/5h** comfortably clears the burn floor for
+the hottest lane. Route-clean in both the 2026-09-12 and 2026-09-24 sweeps. Community verdict
+is mixed-but-positive: "noticeably better than DSv4 Flash 0731" (r/LocalLLaMA 2026-08-28)
+against known verbosity ("90% of output is thinking", NVIDIA forum 2026-09-03) and `!!!!!!`
+loops on very long tasks.
 
-**Why deepseek-v4-pro as #2:** Strongest verified fallback in class (TB2.1 **87.9**
-vendor-reported, SWE-bench Verified **80.6%**, LiveCodeBench 93.5% Pro Max). Family-diverse
-from GLM (DeepSeek vs Zhipu). Fires only on primary failure.
+**Why GPT-6 Luna as #2 (since Sep 24 2026):** The previous fallback (deepseek-v4-pro) remains
+**STILL FLAGGED** on the model-side tool-args-as-text defect (deepseek-ai/DeepSeek-V3#1244,
+open since Apr) — the orchestrator is the max tool-call exposure lane, so the flag is
+disqualifying there. GPT-6 Luna (released 2026-09-22, $0.10/$0.50) is the best replacement:
+AA Intel 37 (ties its predecessor 5.6-Luna at max), route-clean on the Go route, no
+multiplier, training Not used, and **4,230 req/5h (~2x the 5.6-Luna quota at half the
+price)**. Distinct family (OpenAI vs Zhipu) keeps the lane family-diverse. Known limits,
+accepted at fallback depth: AA Coding Agent Index 41 (regression vs 5.6-Luna's 43 on the
+current scale), presentation-Elo regressions (GDPval −75, Briefcase −45 — rubric/presentation
+omissions), verbose at max (~51k output tokens/task), and a supervised-worker profile — it
+runs under the orchestrator's supervision, which is exactly its validated use case.
 
-**Tradeoffs accepted:** GLM verbosity/latency variance (Chinese-chip serving); DeepSeek's
-model-side tool-call text-leak reports (2026-04-24) — Go-side unmitigated; if orchestrator
-calls stall mid-loop, suspect the fallback first.
+**Tradeoffs accepted:** GLM verbosity/latency variance (Chinese-chip serving); Luna's coding
+regression is irrelevant at fallback depth (fires only on primary failure).
 
 **Why `high`, not `max`:** orchestration needs snappy routing, not deep reasoning; max-effort
-overthinks.
+overthinks (and Luna max is notably verbose).
 
-**Next best alternative:** `opencode-go/glm-5.2 (high)` — safe revert (880 req/5h) if Flash
-speed/verbosity degrades in practice.
+**Next best alternative:** `opencode-go/deepseek-v4-pro (high)` — strongest cached fallback
+quality, revert option if Luna misbehaves on the Go route — but keep it out of the
+orchestrator while its tool-call defect is open.
 
 ## Oracle
 
-**Chain:** `opencode-go/deepseek-v4-pro (high)` → `opencode-go/gpt-5.6-luna (high)`
+**Chain:** `opencode-go/mimo-v2.6-pro` → `opencode-go/deepseek-v4-pro (high)`
 📖 [What the Oracle does](https://github.com/alvinunreal/oh-my-opencode-slim#03-oracle-the-guardian-of-paths)
 
-**Why DeepSeek V4 Pro leads:** Best verification evidence available — TB2.1 87.9, SWE-V
-80.6%, Pro Max SWE-Pro 55.4% / LCB 93.5%. Community reviewer profile: "strategic depth,
-detects second-order security issues" (r/opencodeCLI 2026-06-01); gap vs Flash widest on
-hardest reasoning. 1,050 req/5h is acceptable at oracle call volume.
+**Why MiMo-V2.6-Pro leads (experiment since Sep 24 2026):** AA Intelligence **46** — the top
+open-weights model (1st/114 tracked, tied with Grok 4.7, +1 over GLM-5.3), now natively
+omnimodal (text/image/video/audio in; v2.5-pro was text-only). MIT weights, $15/m cap,
+**3,250 req/5h** — above floor at oracle call volume, no multiplier, privacy Not used/0
+days. Sub-evals: AutomationBench-AA 59%, Terminal-Bench 4.0 35%, HLE 49%, SciCode 61%.
+Running **bare** (no variant map exists — variants silently ignored). This is a deliberate
+experiment: strongest verified quality per the roster's own evidence hierarchy at ~1/10 the
+previous lead's burn.
 
-**Why GPT-5.6 Luna as #2 (changed from kimi-k2.6, Sep 12 2026):** Kimi K2.6 is deprecated
-(AA 31, "consider newer") and the weakest scored model in the config. Luna high is
-Pareto-optimal in its family (AA 33 high / 38 max), AA Coding Agent Index **75**, image+pdf
-input, and 2,050 req/5h — above floor, so even sustained fallback use is affordable.
-Family-diverse (OpenAI vs DeepSeek) per the orchestrator/oracle diversity rule.
+**Tradeoffs accepted:** No AA Coding Agent page yet (unverified for coding-agent work);
+vendor benchmarks only for the rest; **TTFT ~17.6s** (workload-dependent, AA-measured — slow
+first token, fast ~129.7 tok/s decode) — acceptable for an advisory lane, painful for
+interactive lanes; hardest-terminal/exploit gaps (TB4.0 35 vs Opus-class 49; ExploitBench
+~48 vs 70–78); isolated freeze/loop anecdotes. Trial with monitoring.
 
-**Next best alternative:** `opencode-go/glm-5.3 (high)` — strongest open reasoning (AA 45)
-but text-only and 220 req/5h (sub-floor); escalation was the only consumer and was removed
-Sep 12 2026.
+**Why deepseek-v4-pro as #2 (demoted from lead):** Still the strongest cached verification
+evidence in the pool (TB2.1 87.9, SWE-bench Verified 80.6%, LiveCodeBench 93.5%). Its
+tool-call flag (STILL FLAGGED, 2026-09-24 re-check) is tolerable at the oracle's moderate
+tool exposure — acceptable at fallback depth, not as the tool-exposed lead. Family-diverse
+from MiMo (DeepSeek vs Xiaomi).
+
+**Next best alternative:** `opencode-go/gpt-5.6-luna (high)` — the recorded revert (AA 33
+high, image+pdf, 2,050 req/5h) if the MiMo experiment disappoints. `opencode-go/glm-5.3
+(high)` (AA 45) is text-only and 220 req/5h sub-floor — rare-fire only.
 
 ## Explorer
 
-**Chain:** `opencode-go/deepseek-v4.1-flash (high)` → `opencode-go/muse-spark-1.3-contributor (high)`
+**Chain:** `opencode-go/deepseek-v4.1-flash (high)` → `opencode-go/mimo-v2.6-flash`
 📖 [What the Explorer does](https://github.com/alvinunreal/oh-my-opencode-slim#02-explorer-the-eternal-wanderer)
 
-**Why DeepSeek V4.1 Flash leads (changed from deepseek-v4-flash, Sep 12 2026):** Released
-2026-09-10 — a drop-in successor at the same $0.15/$0.60 class: AA Intel **40** (#6/113),
-**198.6 tok/s** (#5/113 — the fastest model in the config), image input, and a **4× usage
-multiplier** giving **6,500 req/5h** (per opencode.ai/go, the only source naming
-multipliers). Scout economics ideal: fast, cheap, multimodal fallback exists upstream.
-Deliberately run at `high`, not `max` — the provider catalog's `thinkingLevelMap` maps
-`max`→null on the v4-flash family; anticipate the same gap until verified.
+**Why DeepSeek V4.1 Flash leads:** AA Intel **40** (#6/113), **198.6 tok/s — the fastest
+model in the config** (scouts live and die on latency), image input, route-clean in both
+sweeps. Burn: **26,000 req/5h with the 4x promo; 6,500 base after it ends Sep 27 2026** —
+both far above the 800 floor, so no action needed at expiry. Deliberately run at `high`, not
+`max` — the v4-flash family's `thinkingLevelMap` maps `max`→null.
 
-**Why Muse Spark 1.3 Contributor as #2 (updated from 1.2):** Best cost/intelligence on the
-platform — AA Intel **61** (xhigh), TB2.1 85%, 235 tok/s, $0.55/task, **45,300 req/5h** (the
-cheapest burn in the catalog). Contributor SKU trains on prompts — accepted for this cheap
-lane (and now also for the council gamma seat).
+**Why MiMo-V2.6-Flash as #2 (since Sep 24 2026):** Same $0.14/$0.28 class, **30,100 req/5h
+(highest volume in the Go catalog)**, image+video+audio input, privacy Not used/0d, vendor
+TB2.1 87.6. Accepted as an unverified trial in the low-risk fallback slot: **no AA page —
+zero independent benchmarks**, and its documented failure shapes (nested conditional tool
+calls, cyclic grep-retry loops) matter for a lane that runs grep/AST sweeps — monitor in
+practice. It displaced muse-spark-1.3 (AA 61) here by user choice: the privacy-clean
+Not-used/0d profile outweighed muse's higher AA score at fallback depth for this user.
 
-> **If prompt training is not acceptable:** drop Muse and run
-> `opencode-go/glm-5.3-flash (high)` as the fallback instead — AA Intel 42, vision-capable,
-> 6,320 req/5h, non-contributor; the chain stays family-diverse (DeepSeek lead / Zhipu
-> fallback), and overlap with the orchestrator's primary is acceptable at fallback depth.
-> `opencode-go/deepseek-v4-flash (high)` (AA 50, 13,000 req/5h) is the cheapest non-training
-> scorer but shares the DeepSeek family with the lead — rejected by the family-diversity
-> rule.
+> **Upgrade path:** muse-spark-1.3 (AA 61, 45,300 req/5h) is now eligible on any lane
+> (Contributor restriction lifted Sep 24 2026) — the recorded swap-back if mimo-v2.6-flash
+> misbehaves; `opencode-go/glm-5.3-flash (high)` (AA 42, vision, 6,320 req/5h) is the
+> non-contributor option.
 
-> ⚠️ **Watch:** v4.1-flash is 2 days old — no TB/SWE numbers yet and no community record;
-> the 4× multiplier can change. Muse 1.3's `max` variant is in limited partner preview (use
-> xhigh-or-below). Not reproduced in the 2026-09-12 sweep, but keep chunked sweeps while the
-> old Muse 502-truncation report (#2156, as-of Sep 5) is unconfirmed either way.
-
-**Free equivalent:** `opencode/muse-spark-1.3-contributor-free` is the exact twin of the
-fallback. Paid entry kept deliberately (route stability, sub-cent cost).
+**Tradeoffs accepted:** v4.1-flash promo expiry Sep 27 (post-promo burn still >3x floor);
+MiMo-Flash is 3 days old with vendor-only scores.
 
 ## Librarian
 
 **Chain:** `opencode-go/muse-spark-1.3-contributor (high)` → `opencode-go/glm-5.3-flash (high)`
 📖 [What the Librarian does](https://github.com/alvinunreal/oh-my-opencode-slim#05-librarian-the-weaver-of-knowledge)
 
-**Why Muse Spark 1.3 leads (updated from 1.2, Sep 12 2026):** Research is
-network-latency-dominated, so Spark's TTFT doesn't disqualify it — and its strengths matter
-for docs: AA Intel **61**, full multimodal reading (image+video+audio+pdf) for
-screenshot/diagram-bearing docs, and 45,300 req/5h makes it effectively unbilletable. The
-Sep 5 hold ("knowledge accuracy regressed in 1.3") was re-examined: this lane reads
-docs/knowledge per query with web verification, not long-horizon recall, and 1.3's intel
-jump outweighs it. Privacy tradeoff (prompt training) accepted for this cheap lane.
+**Why Muse Spark 1.3 leads:** Research is network-latency-dominated, so TTFT doesn't
+disqualify it — and its strengths matter for docs: AA Intel **61** (xhigh), full multimodal
+reading (image+video+audio+pdf) for screenshot/diagram-bearing docs, and **45,300 req/5h**
+makes it effectively unbilletable at $0.10/$0.20. The Sep 5 hold ("knowledge accuracy
+regressed in 1.3") was re-examined and dropped for a query-based research lane.
+Contributor SKU — **trains on prompts** (accepted, usable on any lane per Sep 24 decision).
 
-> ⚠️ **Privacy:** Contributor SKU may train on request data — accepted here by decision. If
-> training is not acceptable for what you feed this lane, swap the whole chain: lead
-> `opencode-go/glm-5.3-flash (high)` (keeps image+pdf doc reading, AA 42, 6,320 req/5h,
-> non-contributor) with fallback `opencode-go/qwen3.7-plus` (image+video, 4,300 req/5h, AA
-> 26) — or `opencode-go/deepseek-v4-flash (high)` if your docs are text-only (AA 50,
-> 13,000 req/5h, cheapest non-training scorer).
+> **Privacy alternative:** the in-place fallback `opencode-go/glm-5.3-flash (high)` is
+> non-contributor; for a fully non-contributor chain, lead
+> `opencode-go/glm-5.3-flash (high)` with fallback `opencode-go/deepseek-v4.1-flash (high)`
+> (text+image docs, 6,500–26,000 req/5h).
 
-**Why GLM-5.3-Flash as #2:** AA Intel 42, image+pdf input, 6,320 req/5h, non-contributor (no
-training). Family-diverse from the lead (Zhipu vs Meta-muse).
+**Why GLM-5.3-Flash as #2:** AA Intel 42, image+pdf input, 6,320 req/5h — the clean
+**non-contributor** rescue (the privacy alternative in place). Family-diverse from the lead
+(Zhipu vs Meta-muse).
 
 ## Designer
 
-**Chain:** `opencode-go/glm-5.3-flash (high)` → `opencode-go/gpt-5.6-luna (high)`
+**Chain:** `opencode-go/mimo-v2.6-pro` → `opencode-go/gpt-5.6-luna (high)`
 📖 [What the Designer does](https://github.com/alvinunreal/oh-my-opencode-slim#06-designer-the-guardian-of-aesthetics)
 
-**Why GLM-5.3-Flash leads (changed from kimi-k3 + glm-5.3, Sep 12 2026):** Designer is now a
-**high-use lane** (user-confirmed), so the ~800 req/5h burn floor applies and the old
-premium pick fails it outright: kimi-k3 at **110 req/5h** and glm-5.3 at **220 req/5h** are
-both far under floor — and glm-5.3 is **text-only**, a dealbreaker for screenshot-driven UI
-work. GLM-5.3-flash is the strongest vision-capable scorer under the floor (AA Intel 42,
-image+video+pdf, 6,320 req/5h) and route-clean.
+**Why MiMo-V2.6-Pro leads (since Sep 24 2026):** Designer is a **high-use lane** (800 req/5h
+floor applies — cleared at 3,250 req/5h), and MiMo-Pro brings verified independent quality:
+AA Intelligence **46** — the strongest vision-capable scorer under the floor (GLM-5.3-flash,
+the previous lead, is AA 42) — plus native omnimodal input for screenshot/video-bearing UI
+work. No variant map (run bare). Premium options stay excluded here by policy: grok-4.7 at
+169 req/5h is premium-burn class and user-rejected on cost.
 
-**Why GPT-5.6 Luna as #2:** AA 33 at high, Coding Agent Index 75 (best available coding-agent
-signal for UI logic), Pareto-optimal family, image+pdf, 2,050 req/5h — passes the floor even
-at sustained fallback use. Family-diverse (Zhipu vs OpenAI).
+**Tradeoffs accepted:** **TTFT ~17.6s** (workload-dependent, AA-measured, not Go-verified) —
+for an interactive visual lane this is the main practical risk; watch latency in real
+sessions. Freeze/verbosity anecdotes (aireiter 2026-09-22). Design Arena Code: no data found
+(only in-house Visual Coding 72.3).
 
-**Next best alternative:** `opencode-go/qwen3.7-plus` (AA 26, image+video, 4,300 req/5h) —
-cheap multimodal backup, but well behind on intelligence. Premium options (kimi-k3, glm-5.3)
-stay rejected for this lane while it runs hot; revisit only if designer volume drops back.
+**Why GPT-5.6 Luna as #2:** AA 33 at high, image+pdf, 2,050 req/5h — passes the floor at
+sustained fallback use. Family-diverse (OpenAI vs Xiaomi). Note: its Coding Agent "75"
+figure predates the current index scale — on the current scale it is 43 (still ahead of
+GPT-6 Luna's 41, which is why **GPT-6 Luna is rejected here**: presentation-Elo regressions
+are directly design-relevant).
+
+**Next best alternative:** `opencode-go/glm-5.3-flash (high)` — the Sep 12 lead (AA 42,
+image+video+pdf, 6,320 req/5h); revert option if MiMo-Pro's TTFT proves annoying in practice.
 
 ## Fixer
 
 **Chain:** `opencode-go/deepseek-v4.1-flash (high)` → `opencode-go/qwen3.8-flash (medium)`
 📖 [What the Fixer does](https://github.com/alvinunreal/oh-my-opencode-slim#07-fixer-the-last-builder)
 
-**Why DeepSeek V4.1 Flash leads (user-selected, Sep 12 2026):** Fixer is a high-use lane, so
-the floor applies — and v4.1-flash's 4× multiplier yields **6,500 req/5h** at AA Intel 40 and
-198.6 tok/s: quality + speed + headroom in one pick. Run at `high` (daily-lane ceiling).
+**Why DeepSeek V4.1 Flash leads:** Verified AA Intel 40, **198.6 tok/s (fastest in config)**,
+26,000 req/5h with the 4x promo (6,500 after Sep 27 — both above floor). Quality + speed +
+headroom in one pick; route-clean. Run at `high` (daily-lane ceiling).
 
-**Why Qwen3.8 Flash as #2 (kept, role swapped):** AA Intel 40 (#5/113), image+video,
-5,400 req/5h, family-diverse (Alibaba vs DeepSeek). Variant must be `medium`: the variant map
-is `low/medium/xhigh` — **there is no `high`** (silently invalid), and `xhigh` exceeds the
-daily-lane ceiling. Community flag: loops on long tasks and crawls past ~90k context while
-DeepSeek holds 40 tok/s to 200k — a real reason it's the fallback, not the lead.
+**Why Qwen3.8 Flash as #2:** AA Intel 40, image+video, 5,400 req/5h, family-diverse
+(Alibaba vs DeepSeek). Variant is `medium` — re-verified live Sep 24 2026: the variant map
+is `low/medium/xhigh` (the #45987 `none/high/max` catalog state is not present), `high`
+doesn't exist, and `xhigh` exceeds the daily-lane ceiling (policy #7) — so `medium` is the
+correct ceiling structurally, not just defensively. Community flag stands: loops on long
+tasks and crawls past ~90k context — a real reason it's the fallback.
 
-**Next best alternative:** `opencode-go/gpt-5.6-luna (high)` — AA 33, CAI 75, $0.04/task,
-2,050 req/5h: the quality upgrade candidate, but a high-use lane makes its burn the
-tiebreaker against v4.1-flash's 4× allowance.
+**Next best alternative:** none promoted — `opencode-go/mimo-v2.6-pro` was considered and
+**dropped under the quality-per-burn rule** (Sep 24 2026): its ~15% quality gain (AA 46 vs
+40) costs a ~4–8x per-request burn multiple (3,250 vs 6,500–26,000 req/5h) in the config's
+most tool-dense, retry-heavy lane — v4.1-flash plus retries wins on expected cost-per-success.
+`gpt-6-luna` is rejected for quality lanes (CAI regression); grok-4.7 is premium-banned;
+deepseek-v4-pro is STILL FLAGGED (worst in the most tool-call-dense lane).
+`muse-spark-1.3` (AA 61, 45,300 req/5h, trains on prompts) is now lane-eligible and the
+quality-per-burn standout — a candidate to evaluate next refresh; its non-training
+alternative here would be `opencode-go/qwen3.8-flash`.
 
 ---
 
@@ -194,45 +229,46 @@ tiebreaker against v4.1-flash's 4× allowance.
 📖 [What the Council does](https://github.com/alvinunreal/oh-my-opencode-slim#04-council-the-chorus-of-minds)
 
 Council needs **distinct strong models across distinct families** so a consensus verdict
-isn't three opinions from one lineage. Rebuilt Sep 12 2026 around the burn principle —
-"high burn only when absolutely required and no alternatives exist":
+isn't three opinions from one lineage. Confirmed unchanged Sep 24 2026 — four families
+(DeepSeek / Zhipu / Meta-muse / OpenAI), zero premium:
 
 - **alpha — deepseek-v4-pro:** the evidence judge. Best verified correctness in the pool
-  (TB2.1 87.9, SWE-V 80.6%); reviewer profile fits weighing competing claims. Unchanged.
-- **beta — glm-5.3-flash:** the fast-intellect seat (was glm-5.3). AA 42, 6,320 req/5h,
-  vision-capable so it can judge screenshots too. glm-5.3 scored higher (45) but costs 220
-  req/5h — sub-floor and no longer justified.
-- **gamma — muse-spark-1.3-contributor (was kimi-k3):** kimi-k3 at 110 req/5h was the last
-  premium seat; user explicitly swapped in Muse Spark (AA 61), accepting the prompt-training
-  tradeoff for a manual-only lane. 45,300 req/5h. **If prompt training is not acceptable:**
-  use `opencode-go/qwen3.8-flash` instead (AA 40, Alibaba family, 5,400 req/5h — keeps the
-  council zero-premium and family-diverse) or revert to `opencode-go/kimi-k3` (AA 44) if
-  premium burn is acceptable again.
-- **synthesis — gpt-5.6-luna (max) (was qwen3.7-max):** qwen3.7-max is deprecated (AA 30,
-  170 req/5h). Luna at `max` is a single judgment+writing call — the one place `max` earns
-  its latency — and 2,050 req/5h keeps even premium-flavored synthesis affordable. The
-  standing premium-synthesis exception is no longer needed: the whole council now runs
-  non-premium across four families (DeepSeek / Zhipu / Meta-muse / OpenAI).
+  (TB2.1 87.9, SWE-V 80.6%); reviewer profile fits weighing competing claims. Its tool-call
+  flag is tolerable here — council seats deliberate, they don't loop tools.
+- **beta — glm-5.3-flash:** the fast-intellect seat. AA 42, 6,320 req/5h, vision-capable so
+  it can judge screenshots too.
+- **gamma — muse-spark-1.3-contributor:** highest AA in the roster (61). Contributor SKU —
+  **trains on prompts** (accepted, usable on any lane per Sep 24 decision). Privacy
+  alternative: `opencode-go/qwen3.8-flash` (AA 40, 5,400 req/5h — keeps the council
+  zero-premium and family-diverse).
+- **synthesis — gpt-5.6-luna (max):** a single judgment+writing call — the one place `max`
+  earns its latency; 2,050 req/5h. On the current index scale its Coding Agent figure is 43;
+  GPT-6 Luna (41) does not displace it.
 
 Seat models are plain strings (no variants) per plugin schema; synthesis carries the variant.
 
-**Next best alternative:** `opencode-go/kimi-k3` for any seat if you ever accept the premium
-burn again (AA 44, max-only variant wiring); `opencode-go/glm-5.3` as synthesis fallback.
+**Next best alternatives:** `opencode-go/mimo-v2.6-pro` (AA 46) is the designated future
+candidate once the oracle/designer MiMo experiments bake in — adding it now would put MiMo
+in three primary seats plus a council seat. grok-4.7 (AA 46, CAI 56) is permanently
+excluded (premium-burn, 169 req/5h, user-rejected on cost); do not re-propose.
 
 ---
 
 ## Observer *(optional agent — currently disabled)*
 
-**Chain:** `opencode-go/glm-5.3-flash (high)` → `opencode-go/mimo-v2.5`
+**Chain:** `opencode-go/glm-5.3-flash (high)` → `opencode-go/mimo-v2.6-flash`
 📖 [What the Observer does](https://github.com/alvinunreal/oh-my-opencode-slim#observer-the-silent-witness)
 
 **Disabled** (`disabled_agents: ["observer"]`) per the enablement rule: the observer is
 enabled only when the orchestrator chain cannot see images. Orchestrator primary
 glm-5.3-flash is vision-capable (image+video+pdf), so the system already reads screenshots.
-Dormant chain reviewed and confirmed Sep 12 2026: glm-5.3-flash (high) is the strongest
-vision scorer available (AA 42), mimo-v2.5 the cheapest rescue (AA 22–38 variance, $0.02/task,
-~30,100 req/5h, image+video+audio). If the orchestrator ever reverts to a text-only lead,
-re-enable the observer (`disabled_agents: []`) before any screenshot-heavy session.
+
+Dormant chain reviewed and updated Sep 24 2026: glm-5.3-flash (high) remains the strongest
+vision scorer available under the floor (AA 42); the dormant fallback was gen-upgraded to
+mimo-v2.6-flash (30,100 req/5h, image+video+audio, privacy Not used/0d, vendor TB2.1 87.6 —
+unverified by AA, accepted in a dormant rescue slot). If the orchestrator ever reverts to a
+text-only lead, re-enable the observer (`disabled_agents: []`) before any screenshot-heavy
+session.
 
 ---
 
@@ -243,20 +279,23 @@ block with its own prompt and routing rules.
 
 ### Handyman
 
-**Chain:** `opencode-go/mimo-v2.5` → `opencode-go/deepseek-v4-flash (low)`
+**Chain:** `opencode-go/mimo-v2.6-flash` → `opencode-go/deepseek-v4-flash (low)`
 
 **What it does:** Fast utility worker for mechanical shell/ops tasks — commits, linting,
 formatting, scripts, test suites, bulk file ops, build checks. Bash-centric, concise results;
 does not touch code logic (Fixer's job).
 
-**Why MiMo V2.5 leads (kept):** Mechanical ops need reliability, concision, and huge quota
-headroom, not intelligence: **30,100 req/5h** (largest in the catalog), $0.02/task, lowest
-verbosity, multimodal image input (reads error screenshots), 1M context, route-clean in the
-2026-09-12 sweep. Its weak AA 22–38 is fine for shell work. No variant map — run bare.
+**Why MiMo-V2.6-Flash leads (gen-upgrade from v2.5, Sep 24 2026):** Mechanical ops need
+reliability, concision, and huge quota headroom, not intelligence: **30,100 req/5h (largest
+burn allowance in the catalog)**, $0.14/$0.28 sub-cent, lowest verbosity, image+video+audio
+input (reads error screenshots), 1M context, route-clean. Vendor TB2.1 87.6 vs v2.5's AA
+22–38 — a like-for-like generational upgrade at identical burn. Its grep-loop failure shape
+is shell-irrelevant; no variant map — run bare.
 
-**Why DeepSeek V4 Flash as #2:** AA Intel 50, TB2.1 82.7, SWE-V 79.0%, 13,000 req/5h at `low`
-effort — ample rescue for shell/ops. Family-diverse (DeepSeek vs Xiaomi). Carries the
-model-side tool-call text-leak flag shared with the DeepSeek family.
+**Why DeepSeek V4 Flash as #2:** AA Intel 50, TB2.1 82.7, SWE-V 79.0%, **13,000 req/5h at
+`low` effort** — ample rescue for shell/ops. Family-diverse (DeepSeek vs Xiaomi). Carries the
+model-side tool-call text-leak flag shared with the DeepSeek family — `low` effort minimizes
+exposure, and handyman is the lowest tool-call lane in the config.
 
 ---
 
@@ -264,40 +303,49 @@ model-side tool-call text-leak flag shared with the DeepSeek family.
 
 Open items to monitor — revisit on the next `/model-refresh`:
 
-- **deepseek-v4 family tool-call text-leak** — Pro/Flash return tool-call args as text
-  instead of proper tool_call messages (r/DeepSeek 2026-04-24; vLLM fix cited, no confirmed
-  Go-side mitigation). Affects orchestrator #2, oracle lead, handyman #2. Suspect #1 if any
-  agent loop stalls mid-call.
-- **deepseek-v4.1-flash** — only 2 days old at assignment: no TB/SWE numbers, no community
-  record, **4× usage multiplier must be re-verified** (multipliers live only at
-  opencode.ai/go and can change), and anticipate the v4-flash `max`→null wiring gap (run
-  `high`, never `max`, until verified).
-- **qwen3.8-flash variant wiring** — `low/medium/xhigh` only, **no `high`**; old `max`
-  truncation on the Go route (#45987, as-of Sep 5) still unrefuted → `medium` is the correct
-  ceiling in fixer. Also loops on long tasks / crawls past ~90k ctx.
-- **hy4-preview** — free window ended ~2026-09-11 (2 weeks from 2026-08-28 launch); rolling
-  preview with no deprecation date, no AA benchmarks (unverified). Do not promote until
-  independent data exists.
-- **Muse Spark prompt training** — accepted (user-confirmed) for explorer/librarian cheap
-  lanes and now the council gamma seat; keep out of quality-critical lanes. `max` variant is
-  partner-preview-gated (use xhigh or below). Non-training alternatives per seat are
-  documented in the explorer, librarian, and council sections above.
-- **Removed escalation agent (Sep 12 2026)** — the sub-floor glm-5.3 (220 req/5h) chain is
-  gone; hard-debug work routes to `@oracle` (`deepseek-v4-pro (high)` →
-  `gpt-5.6-luna (high)`). If a heavyweight lane is ever re-added, glm-5.3 (max) is the
-  recorded candidate — text-only and sub-floor, acceptable only as rare-fire.
-- **Omen Alpha (released Sep 4 2026)** — still held: undisclosed vendor, zero independent
-  benchmarks, `low`/`high` only. Re-rate when vendor reveals and first AA run lands
-  (precedent: ox-alpha → GLM-5.3-Flash).
-- **deepseek-v4-flash-vision-exp graduation** — experimental, no announced expiry (as-of
-  Sep 5). Now shadowed by v4.1-flash (stable, image input) — mostly superseded.
-- **MiniMax ban stands** — HTTP 2013 tool-call/thinking validation failures on the Go route;
-  no verified fix as of 2026-09-12. Keep `minimax-m2.7`/`minimax-m3` out of all chains.
-- **Unrefuted Sep 5 watch items** (not reproduced in the 2026-09-12 sweep, which found no
-  Go-route issues for muse-spark/hy3 — keep monitoring): Muse 1.3 502-truncation on large
-  sweeps (#2156); deepseek-v4-flash JSON-Schema `minimum`/`maximum` rejection (#43378);
-  hy3 empty SSE streams (#43852) / compaction (#45168, #46137) / TTFT (#44579); free-tier
-  retention flags (#44659 muse-free endpoint pinning, #44225 nemotron instruction-following).
-- **DeepSeek ZDR** — valid through **Sep 30 2026**; recheck renewal next refresh.
-- **Multiplier drift** — per-model usage multipliers (4× v4.1-flash, GLM-5.3-Flash's higher
-  allowance) can change without notice; re-verify every refresh before doing burn math.
+- **MiMo concentration** — 5 slots in one vendor family: mimo-v2.6-flash (handyman primary,
+  explorer + dormant-observer fallbacks), mimo-v2.6-pro (oracle AND designer primary).
+  - **Why:** a systemic MiMo-family weakness on the Go route would fail all 5 slots at once,
+    and the evidence base is weak — 3-day-old models, vendor-only benchmarks,
+    already-documented grep-retry/nested-tool-call failure shapes.
+  - **Trigger:** if agents loop or stall mid-task, suspect MiMo first. Escape hatches:
+    explorer → muse-spark-1.3, handyman → deepseek-v4-flash (in place), oracle →
+    deepseek-v4-pro, designer → glm-5.3-flash. Retire once the family has a clean
+    first-weeks record. (Fixer promotion dropped Sep 24 2026, quality-per-burn rule.)
+- **mimo-v2.6-pro TTFT (~17.6s)** — workload-dependent, AA-measured, not Go-verified.
+  - **Why:** designer is the most latency-sensitive interactive lane, and the figure has
+    never been confirmed through the Go route.
+  - **Trigger:** revert designer to `opencode-go/glm-5.3-flash (high)` if real sessions
+    feel sluggish.
+- **deepseek-v4-pro STILL FLAGGED** — tool-args-as-text (#1244, open since Apr) plus
+  Go-path 400s; no Sep 12–24 fixes; confined to oracle fallback + council alpha.
+  - **Why:** the defect returns tool args as plain text and stalls agent loops — tolerable
+    at these lanes' moderate/low tool exposure, disqualifying anywhere tool-heavy.
+  - **Trigger:** clear only on a verified fix; this is the recorded orchestrator-fallback
+    revert if gpt-6-luna misbehaves.
+- **deepseek-v4.1-flash 4x promo ends Sep 27 2026** — burn drops 26,000 → 6,500 req/5h.
+  - **Why:** multipliers can change without notice, and post-promo 6,500 req/5h is still
+    >3x the hot-lane floor — the expiry is an economics change, not a breakage.
+  - **Trigger:** price any new volume commitment at the post-promo rate.
+- **gpt-6-luna (orchestrator fallback)** — supervised-worker profile; one reported
+  critical-code deletion + ignored "do not spawn" constraint unsupervised (r/codex via
+  Tabbit 2026-09-23); verbose at max (~51k output tokens/task).
+  - **Why:** it's assigned where supervision exists, but unsupervised instruction drift is
+    its documented failure mode.
+  - **Trigger:** watch for drift in fallback duty; revert to deepseek-v4-pro if loops stall.
+- **space-bunny-free quarantined** — free, unlimited, but privacy contradiction (Go docs
+  "Not used/0 days" vs OpenRouter stealth terms "may train", Siora 2026-09-23) and zero
+  independent benchmarks.
+  - **Why:** a model that may train on prompts cannot be trusted with private code, and
+    "strong coding" is unmeasured listing copy.
+  - **Trigger:** trial eligibility only when the privacy contradiction is resolved AND
+    first independent benchmarks land.
+- **hy4-preview** — free window ended ~2026-09-11; rolling preview, still listed active in
+  Go docs 2026-09-24, no AA benchmarks.
+  - **Why:** preview SKUs iterate or get replaced without notice, and there is no
+    independent quality data to justify promotion.
+  - **Trigger:** do not promote until first independent benchmarks exist.
+- **Multiplier drift** — currently only 4x v4.1-flash (ends Sep 27).
+  - **Why:** multipliers change without notice and every burn comparison (floors,
+    tradeoffs) depends on them; they are visible only at opencode.ai/go, not the CLI.
+  - **Trigger:** re-verify per model every refresh before burn math.
