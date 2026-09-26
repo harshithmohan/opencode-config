@@ -6,6 +6,37 @@ Append-only history of model assignment changes in
 "no changes" entries); `MODEL_CHOICES.md` holds the current rationale snapshot.
 Never rewrite or delete prior entries.
 
+## 2026-09-26 — Watch-lane refresh + handyman lane removed
+
+Scope: watch-lane refresh (availability re-diffed via `opencode models opencode-go --verbose`
+— no new/removed/changed models vs cache; quota economics re-fetched per the never-trust-cache
+rule; go-route re-verification via @librarian for all flagged watch-list models) plus a
+usage-data verdict on the custom handyman agent.
+
+- **handyman (custom agent): removed** — the entire `agents.handyman` block was deleted
+  from `oh-my-opencode-slim.json` after a session-log audit (`opencode.db`: 127 sessions,
+  7,268 messages). Usage evidence: 15 assistant messages ever (Sep 20 + Sep 25, 4 sessions;
+  18 bash calls) vs the orchestrator's 462 direct bash calls in the last 14 days — the
+  orchestrator's delegation rule treats single isolated low-risk actions (commit, lint,
+  status check) as direct work, which describes nearly the whole handyman lane, so
+  delegation almost never fires. Gained: less dormant config; rare mechanical delegations
+  route back to the orchestrator, which demonstrably does this work itself. Lost: the
+  option of offloading batch mechanical task cycles without burning orchestrator context
+  on tool output — re-add via a custom agent block if that need shows up in practice.
+  deepseek-v4-flash leaves the config with the lane (remains in the catalog, cache entry
+  kept); muse-spark-1.3 stays librarian primary + council gamma. JSON validated after the
+  edit.
+- **oracle: no changes** — mimo-v2.6-pro → deepseek-v4-pro (high) reaffirmed; user accepted
+  the flagged fallback at the oracle's moderate tool exposure.
+- **council: no changes** — alpha deepseek-v4-pro reaffirmed (beta glm-5.3-flash, gamma
+  muse-spark-1.3-contributor, synthesis gpt-5.6-luna (max) untouched).
+- **quota resolution (no config change)** — DeepSeek V4.1 Flash verified flat 26,000 req/5h
+  ($60/m tier); the 4x promo display was removed from opencode.ai/go and the user confirmed
+  the increase is permanent (no multiplier). The flat rate clears every floor the promo rate
+  did, so no chain was touched.
+- **flags unchanged** — deepseek-v4-pro, deepseek-v4-flash, qwen3.8-flash re-verified STILL
+  FLAGGED (zero fixes since Apr, no new reports either; #45987 still open unrefuted).
+
 ## 2026-09-24 — 9-lane refresh: 5 new Go models onboarded, MiMo experiment lanes
 
 Full-scope run: availability re-diffed via `opencode models opencode-go --verbose` (5 new

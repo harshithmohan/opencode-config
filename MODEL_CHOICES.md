@@ -1,7 +1,7 @@
 # Model Choices — Why Each Agent Runs What It Runs
 
 Reasoning behind every model assignment in [`oh-my-opencode-slim.json`](config/oh-my-opencode-slim.json).
-Snapshot rewritten Sep 24 2026 from a 9-lane `/model-refresh`; evidence cited from Artificial
+Snapshot rewritten Sep 26 2026 from a watch-lane `/model-refresh`; evidence cited from Artificial
 Analysis (Intelligence Index), community field reports, Go-route reliability sweeps, and the
 OpenCode Go Estimated Requests table (burn authority — see principles). Transition history
 lives in [`MODEL_CHANGELOG.md`](./MODEL_CHANGELOG.md); raw findings in
@@ -16,22 +16,22 @@ names its non-training privacy alternative.
 ## General principles
 
 1. **Burn authority = the Estimated Requests table** at
-   <https://opencode.ai/docs/go#estimated-requests> (req/5h per model). **Never** reason from
+   <https://opencode.ai/docs/go#estimated-requests>     (req/5h per model). **Never** reason from
    dollar prices or monthly dollar caps — quota economics are request-rate economics on a
-   shared pool. Key rows (as-of 2026-09-24): MiMo-V2.6-Flash 30,100 · MiMo-V2.5 30,100 ·
+   shared pool. Key rows (as-of 2026-09-26): MiMo-V2.6-Flash 30,100 · MiMo-V2.5 30,100 ·
    Muse Spark 1.2/1.3 45,300 · DeepSeek V4 Flash 13,000 · LongCat-2.0 11,400 ·
-   DeepSeek V4.1 Flash 26,000 w/ 4x promo (6,500 after Sep 27) · GLM-5.3-Flash 6,320 ·
-   Qwen3.8 Flash 5,400 · GPT-6 Luna 4,230 · MiMo-V2.6-Pro 3,250 · Hy3 4,300 ·
-   Qwen3.7 Plus 4,300 · GPT-5.6 Luna 2,050 · DeepSeek V4 Pro 1,050 · Kimi K2.7 Code 1,350 ·
-   Kimi K2.6 1,150 · GLM-5.2 880 · Grok 4.6/4.7 169 · Qwen3.8 Max 160 · GLM-5.3 220 ·
-   Kimi K3 110.
+   DeepSeek V4.1 Flash 26,000 (flat, permanent — user-confirmed 2026-09-26, no multiplier) ·
+   GLM-5.3-Flash 6,320 · Qwen3.8 Flash 5,400 · GPT-6 Luna 4,230 · MiMo-V2.6-Pro 3,250 ·
+   Hy3 4,300 · Qwen3.7 Plus 4,300 · Qwen3.6 Plus 3,300 · GPT-5.6 Luna 2,050 ·
+   DeepSeek V4 Pro 1,050 · Kimi K2.7 Code 1,350 · Kimi K2.6 1,150 · GLM-5.2 880 ·
+   GLM-5.1 880 · Grok 4.6/4.7 169 · Qwen3.8 Max 160 · GLM-5.3 220 · Kimi K3 110.
 2. **Burn floor for hot lanes** — any lane the user actively works through (orchestrator,
    explorer, librarian, designer, fixer) needs ≥~800 req/5h (GLM-5.3-Flash is the reference).
    Sub-floor models are only acceptable where calls are genuinely rare.
 3. **Premium-burn models are excluded from every lane including council** (policy amended
    Sep 24 2026 — grok-4.7 rejected on burn cost).
 4. **Quality-first for judgment lanes** (orchestrator/oracle/designer/fixer), **cheap-but-fast
-   for volume lanes** (explorer/librarian/handyman) — Contributor SKUs (Muse Spark, which
+   for volume lanes** (explorer/librarian) — Contributor SKUs (Muse Spark, which
    trains on prompts) acceptable on ANY lane per user decision (Sep 24 2026). **Quality is
    bought efficiently**: on quality per burn (AA score vs req/5h), never raw quality or raw
    cheapness — a modest quality gain at a disproportionate burn multiple is rejected; run the
@@ -113,7 +113,8 @@ interactive lanes; hardest-terminal/exploit gaps (TB4.0 35 vs Opus-class 49; Exp
 
 **Why deepseek-v4-pro as #2 (demoted from lead):** Still the strongest cached verification
 evidence in the pool (TB2.1 87.9, SWE-bench Verified 80.6%, LiveCodeBench 93.5%). Its
-tool-call flag (STILL FLAGGED, 2026-09-24 re-check) is tolerable at the oracle's moderate
+tool-call flag (STILL FLAGGED, 2026-09-26 re-check — still zero fixes) is tolerable at the
+oracle's moderate
 tool exposure — acceptable at fallback depth, not as the tool-exposed lead. Family-diverse
 from MiMo (DeepSeek vs Xiaomi).
 
@@ -128,8 +129,8 @@ high, image+pdf, 2,050 req/5h) if the MiMo experiment disappoints. `opencode-go/
 
 **Why DeepSeek V4.1 Flash leads:** AA Intel **40** (#6/113), **198.6 tok/s — the fastest
 model in the config** (scouts live and die on latency), image input, route-clean in both
-sweeps. Burn: **26,000 req/5h with the 4x promo; 6,500 base after it ends Sep 27 2026** —
-both far above the 800 floor, so no action needed at expiry. Deliberately run at `high`, not
+sweeps. Burn: **26,000 req/5h — the flat standing rate** (user-confirmed permanent 2026-09-26, no
+multiplier). Deliberately run at `high`, not
 `max` — the v4-flash family's `thinkingLevelMap` maps `max`→null.
 
 **Why MiMo-V2.6-Flash as #2 (since Sep 24 2026):** Same $0.14/$0.28 class, **30,100 req/5h
@@ -145,8 +146,8 @@ Not-used/0d profile outweighed muse's higher AA score at fallback depth for this
 > misbehaves; `opencode-go/glm-5.3-flash (high)` (AA 42, vision, 6,320 req/5h) is the
 > non-contributor option.
 
-**Tradeoffs accepted:** v4.1-flash promo expiry Sep 27 (post-promo burn still >3x floor);
-MiMo-Flash is 3 days old with vendor-only scores.
+**Tradeoffs accepted:** v4.1-flash quota verified flat (26,000 req/5h, 2026-09-26) — no
+expiry watch remains; MiMo-Flash is 4 days old with vendor-only scores.
 
 ## Librarian
 
@@ -163,7 +164,7 @@ Contributor SKU — **trains on prompts** (accepted, usable on any lane per Sep 
 > **Privacy alternative:** the in-place fallback `opencode-go/glm-5.3-flash (high)` is
 > non-contributor; for a fully non-contributor chain, lead
 > `opencode-go/glm-5.3-flash (high)` with fallback `opencode-go/deepseek-v4.1-flash (high)`
-> (text+image docs, 6,500–26,000 req/5h).
+> (text+image docs, 26,000 req/5h).
 
 **Why GLM-5.3-Flash as #2:** AA Intel 42, image+pdf input, 6,320 req/5h — the clean
 **non-contributor** rescue (the privacy alternative in place). Family-diverse from the lead
@@ -201,8 +202,8 @@ image+video+pdf, 6,320 req/5h); revert option if MiMo-Pro's TTFT proves annoying
 📖 [What the Fixer does](https://github.com/alvinunreal/oh-my-opencode-slim#07-fixer-the-last-builder)
 
 **Why DeepSeek V4.1 Flash leads:** Verified AA Intel 40, **198.6 tok/s (fastest in config)**,
-26,000 req/5h with the 4x promo (6,500 after Sep 27 — both above floor). Quality + speed +
-headroom in one pick; route-clean. Run at `high` (daily-lane ceiling).
+26,000 req/5h flat standing rate (permanent, verified 2026-09-26 — well above floor).
+Quality + speed + headroom in one pick; route-clean. Run at `high` (daily-lane ceiling).
 
 **Why Qwen3.8 Flash as #2:** AA Intel 40, image+video, 5,400 req/5h, family-diverse
 (Alibaba vs DeepSeek). Variant is `medium` — re-verified live Sep 24 2026: the variant map
@@ -272,61 +273,36 @@ session.
 
 ---
 
-## Custom Agents
-
-This one isn't part of upstream oh-my-opencode-slim — it's a custom `agents.<name>`
-block with its own prompt and routing rules.
-
-### Handyman
-
-**Chain:** `opencode-go/mimo-v2.6-flash` → `opencode-go/deepseek-v4-flash (low)`
-
-**What it does:** Fast utility worker for mechanical shell/ops tasks — commits, linting,
-formatting, scripts, test suites, bulk file ops, build checks. Bash-centric, concise results;
-does not touch code logic (Fixer's job).
-
-**Why MiMo-V2.6-Flash leads (gen-upgrade from v2.5, Sep 24 2026):** Mechanical ops need
-reliability, concision, and huge quota headroom, not intelligence: **30,100 req/5h (largest
-burn allowance in the catalog)**, $0.14/$0.28 sub-cent, lowest verbosity, image+video+audio
-input (reads error screenshots), 1M context, route-clean. Vendor TB2.1 87.6 vs v2.5's AA
-22–38 — a like-for-like generational upgrade at identical burn. Its grep-loop failure shape
-is shell-irrelevant; no variant map — run bare.
-
-**Why DeepSeek V4 Flash as #2:** AA Intel 50, TB2.1 82.7, SWE-V 79.0%, **13,000 req/5h at
-`low` effort** — ample rescue for shell/ops. Family-diverse (DeepSeek vs Xiaomi). Carries the
-model-side tool-call text-leak flag shared with the DeepSeek family — `low` effort minimizes
-exposure, and handyman is the lowest tool-call lane in the config.
-
----
-
 ## Watch-list
 
 Open items to monitor — revisit on the next `/model-refresh`:
 
-- **MiMo concentration** — 5 slots in one vendor family: mimo-v2.6-flash (handyman primary,
-  explorer + dormant-observer fallbacks), mimo-v2.6-pro (oracle AND designer primary).
-  - **Why:** a systemic MiMo-family weakness on the Go route would fail all 5 slots at once,
-    and the evidence base is weak — 3-day-old models, vendor-only benchmarks,
-    already-documented grep-retry/nested-tool-call failure shapes.
-  - **Trigger:** if agents loop or stall mid-task, suspect MiMo first. Escape hatches:
-    explorer → muse-spark-1.3, handyman → deepseek-v4-flash (in place), oracle →
-    deepseek-v4-pro, designer → glm-5.3-flash. Retire once the family has a clean
-    first-weeks record. (Fixer promotion dropped Sep 24 2026, quality-per-burn rule.)
+- **MiMo concentration** — 4 slots in one vendor family: mimo-v2.6-flash (explorer +
+   dormant-observer fallbacks), mimo-v2.6-pro (oracle AND designer primary). (A fifth slot,
+   handyman primary, was removed Sep 26 2026 when the lane itself was deleted on usage data.)
+   - **Why:** a systemic MiMo-family weakness on the Go route would fail all 4 slots at once,
+     and the evidence base is weak — 4-day-old models, vendor-only benchmarks,
+     already-documented grep-retry/nested-tool-call failure shapes.
+   - **Trigger:** if agents loop or stall mid-task, suspect MiMo first. Escape hatches:
+     explorer → muse-spark-1.3, oracle →
+     deepseek-v4-pro, designer → glm-5.3-flash. Retire once the family has a clean
+     first-weeks record. (Fixer promotion dropped Sep 24 2026, quality-per-burn rule.)
 - **mimo-v2.6-pro TTFT (~17.6s)** — workload-dependent, AA-measured, not Go-verified.
   - **Why:** designer is the most latency-sensitive interactive lane, and the figure has
     never been confirmed through the Go route.
   - **Trigger:** revert designer to `opencode-go/glm-5.3-flash (high)` if real sessions
     feel sluggish.
 - **deepseek-v4-pro STILL FLAGGED** — tool-args-as-text (#1244, open since Apr) plus
-  Go-path 400s; no Sep 12–24 fixes; confined to oracle fallback + council alpha.
-  - **Why:** the defect returns tool args as plain text and stalls agent loops — tolerable
-    at these lanes' moderate/low tool exposure, disqualifying anywhere tool-heavy.
-  - **Trigger:** clear only on a verified fix; this is the recorded orchestrator-fallback
-    revert if gpt-6-luna misbehaves.
-- **deepseek-v4.1-flash 4x promo ends Sep 27 2026** — burn drops 26,000 → 6,500 req/5h.
-  - **Why:** multipliers can change without notice, and post-promo 6,500 req/5h is still
-    >3x the hot-lane floor — the expiry is an economics change, not a breakage.
-  - **Trigger:** price any new volume commitment at the post-promo rate.
+   Go-path 400s; re-verified 2026-09-26 — still zero fixes; confined to oracle fallback +
+   council alpha (user reaffirmed keeping both Sep 26 2026).
+   - **Why:** the defect returns tool args as plain text and stalls agent loops — tolerable
+     at these lanes' moderate/low tool exposure (user's call), disqualifying anywhere
+     tool-heavy.
+   - **Trigger:** clear only on a verified fix; this is the recorded orchestrator-fallback
+     revert if gpt-6-luna misbehaves.
+- **deepseek-v4.1-flash quota — RESOLVED 2026-09-26** — flat 26,000 req/5h confirmed
+   permanent. Note: a 2026-09-25-dated /docs/go snapshot still displayed the old
+   "4x · Ends Sep 27" row — re-check the docs page next refresh for cleanup.
 - **gpt-6-luna (orchestrator fallback)** — supervised-worker profile; one reported
   critical-code deletion + ignored "do not spawn" constraint unsupervised (r/codex via
   Tabbit 2026-09-23); verbose at max (~51k output tokens/task).
@@ -345,7 +321,9 @@ Open items to monitor — revisit on the next `/model-refresh`:
   - **Why:** preview SKUs iterate or get replaced without notice, and there is no
     independent quality data to justify promotion.
   - **Trigger:** do not promote until first independent benchmarks exist.
-- **Multiplier drift** — currently only 4x v4.1-flash (ends Sep 27).
-  - **Why:** multipliers change without notice and every burn comparison (floors,
-    tradeoffs) depends on them; they are visible only at opencode.ai/go, not the CLI.
-  - **Trigger:** re-verify per model every refresh before burn math.
+- **Multiplier drift** — currently NONE in the catalog (the 4x v4.1-flash promo display was
+   removed between Sep 24 and 26; rate is flat 26,000).
+   - **Why:** multipliers change without notice and every burn comparison (floors,
+     tradeoffs) depends on them; they are visible only at opencode.ai/go, not the CLI.
+   - **Trigger:** re-verify per model every refresh before burn math; also re-verify the
+     v4.1-flash $60/m tier assignment next refresh.

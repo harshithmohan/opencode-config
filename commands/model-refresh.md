@@ -31,8 +31,11 @@ date on every write):
 ## Availability Snapshot (as-of YYYY-MM-DD)
 - <provider/model>: variants={...}; multimodal=image|none; usage_multiplier=2x; notes
 
-## Quota Economics (as-of YYYY-MM-DD; source: opencode.ai/docs/go/#usage-limits)
-- <fact>
+## Quota Snapshot (as-of YYYY-MM-DD; source: opencode.ai/docs/go/)
+- <req/5h, multiplier, peak/off-peak, price facts — re-fetched every refresh>
+
+## Stable Quota Facts (90-day TTL)
+- <privacy/training terms, endpoints, structural doc claims>
 
 ## Per-Model Research
 ### <provider/model>
@@ -58,7 +61,17 @@ date on every write):
    being newly proposed for a lane it wasn't researched for.
 3. **Go-route reliability** must also be re-verified for any model currently
    flagged in the watch-list, even if fresh.
-4. **Quota economics** doc facts are re-verified when older than 90 days or
+4. **Quota economics is never trusted from cache either.** The Go quota page's
+   numeric tables (req/5h, multipliers, pricing) are volatile and carry expiry
+   dates (e.g. promotional multipliers), with no page timestamp — and burn-rate
+   figures gate lane selection (policy #4), so stale numbers silently corrupt
+   it. The `/docs/go` page is re-fetched **every refresh** (one webfetch, near
+   free). The cached Quota Snapshot exists only as the previous state to diff
+   against, so the review sees what moved (multiplier dropped/expired, new
+   SKU, limit change). Only genuinely stable narrative facts (privacy and
+   model-training terms, endpoint docs) follow the 90-day re-verification rule;
+   since the fetch already happened, treat 90 days as the forced re-read for
+   those, not a reason to skip the fetch. Re-verify stable facts early anyway
    when observed burn behavior contradicts them.
 5. **Reference docs** (README, council.md) are re-fetched only when their
    cached snapshot is >90 days old or a lane's role guidance is actually in
@@ -145,8 +158,11 @@ Usage limits: <https://opencode.ai/docs/go/#usage-limits> (flat sub; dollar-quot
 per 5h/week/month). "Expensive" means quota **burn rate**, not just token price.
 Verify candidates keep a full working session well under the 5h cap.
 
-**Reuse the cached Quota Economics facts if they are fresh (rule 4 above);
-otherwise re-fetch the doc and update the cache.**
+**Re-fetch the `/docs/go` page every refresh (rule 4 above): never reuse cached
+burn-rate figures.** Diff the fresh numbers against the cached Quota Snapshot
+so the review sees what moved (multiplier expired or dropped, new SKU, changed
+limits), and note any diffs explicitly. Update the Quota Snapshot and Stable
+Quota Facts sections after this step.
 
 **The Go quota is a combined pool shared across ALL models** — per-model
 req/5h figures (Estimated Requests table) are burn rates against the shared cap,
@@ -192,19 +208,30 @@ passes complete, with today's date as `as-of` and source links.**
 
 ## Step 5 — Per-lane review, confirm, apply
 
-Work ONE lane at a time; the user confirms each before any edit:
+Confirm every lane that has a good-enough feasible change requiring a user
+decision — including side-grades, not just strict upgrades. Only lanes where
+the strong recommendation is keeping the existing model are skipped with a
+single one-line note; no confirmation, no edit. The user may explicitly ask
+to check a skipped lane.
 
-1. For the lane under review, present:
+Work ONE decision lane at a time; the user confirms each before any edit:
+
+1. Triage every lane first: if research and policy point to keeping the
+   current chain, list the lane in one line ("lane X: recommend keeping
+   current, no change") and move on. Any lane with a feasible proposed
+   change — upgrade, side-grade, or rebalance — is a **decision lane**.
+2. For each decision lane (one at a time), present:
    (a) an **alternatives-considered table** with why each runner-up lost, and
    (b) **proposed vs current**, position by position.
    Include the agent's role guidance (README "Meet the Pantheon" + council.md for
    council) as a reference facet — not a hard rule, it may reference old models.
-2. Get explicit user confirmation for that lane (question tool) before editing.
-3. Apply that lane's edit incrementally, preserving all unrelated settings
+3. Get explicit user confirmation for that lane (question tool) before editing.
+4. Apply that lane's edit incrementally, preserving all unrelated settings
    (skills, mcps, prompts, council, multiplexer).
-4. Validate after every lane:
+5. Validate after every lane:
    `node -e "JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'))" <config-path>`
-5. After the last lane: final read-through of the config, summary of the full
+6. After the last lane: summary of keep-decisions (one line each) and changed
+   lanes, final read-through of the config, full
    end-state, and a watch-list of monitoring flags (latency unknowns, preview
    expiries, shared premium quota).
 6. Tell the user: changes apply on the next OpenCode run; restart to apply now.
@@ -234,9 +261,10 @@ After the last lane is confirmed and applied, update the two docs (both live in
    is the only place transition history lives. If a refresh produces no
    changes, add a dated "no changes" entry.
 3. **Write back `MODEL_EVIDENCE_CACHE.md`**: replace the Availability Snapshot
-   with the freshly diffed state, update or add any per-model entries touched
-   this run with new `as-of` dates, prune entries for removed models, refresh
-   the Doc Snapshots if re-fetched, and bump the top-level `Updated:` date.
+   and the Quota Snapshot with the freshly fetched state, update or add any
+   per-model entries touched this run with new `as-of` dates, prune entries
+   for removed models, refresh the Stable Quota Facts and Doc Snapshots if
+   re-verified/re-fetched, and bump the top-level `Updated:` date.
 
 ## Source of Truth
 
