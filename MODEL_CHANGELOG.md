@@ -6,6 +6,48 @@ Append-only history of model assignment changes in
 "no changes" entries); `MODEL_CHOICES.md` holds the current rationale snapshot.
 Never rewrite or delete prior entries.
 
+## 2026-09-27 — full refresh + second pass (glm-5.3-flash demoted everywhere; longcat-2.5-preview-free added; designer → muse-spark-1.3)
+
+Scope: full refresh plus a targeted oracle/designer re-analysis. New model found:
+opencode-go/longcat-2.5-preview-free (2026-09-25, free/unlimited limited-time, image input,
+variants low/medium/high); quota table otherwise unchanged, no multipliers. Research
+confirmed glm-5.3-flash's slowness is documented (4–60 tok/s serving variance; user-observed
+<10–20 tok/s dips) and mimo-v2.6-pro's overthinking is documented (cached "~17.6s TTFT" was
+a TTFT/TTFAT mix-up — real time-to-first-answer 39–49s, ~59% reasoning share, no effort knob
+on the Go route); go-route re-checks left deepseek-v4-pro and qwen3.8-flash still flagged.
+Also confirmed via DeepSeek launch specs (2026-09-10): deepseek-v4.1-flash is natively
+image-capable; deepseek-v4-flash-vision-exp is a retired alias routing to it.
+
+- **orchestrator: opencode-go/glm-5.3-flash (high) → opencode-go/deepseek-v4.1-flash (high)**
+  — fallback opencode-go/gpt-6-luna (high) unchanged. Gained: fastest model in the config
+  (198.6 tok/s) with 4x the burn headroom (26,000 vs 6,320 req/5h) at equal AA class (39–40
+  vs 42). Lost: flash's proven route record and always-on screenshot reading until
+  v4.1-flash images are exercised on the Go route.
+- **librarian: fallback opencode-go/glm-5.3-flash (high) → opencode-go/longcat-2.5-preview-free (high)**
+  — primary opencode-go/muse-spark-1.3-contributor (high) unchanged. Gained: zero-burn
+  image-capable non-contributor rescue. Lost: a route-proven fallback (longcat untested,
+  unofficial ~Oct 9 expiry on watch).
+- **council beta: opencode-go/glm-5.3-flash → opencode-go/mimo-v2.6-pro** (plain seat
+  string). Gained: AA 46 vs 42, native omnimodal, 3,250 req/5h, family diversity preserved.
+  Runner-up glm-5.2 rejected (AA unverified).
+- **observer (dormant, still disabled): opencode-go/glm-5.3-flash (high) →
+  opencode-go/mimo-v2.6-flash** (promoted from fallback) and **fallback opencode-go/mimo-v2.6-flash →
+  opencode-go/longcat-2.5-preview-free (high)**. Orchestrator primary is image-capable, so
+  observer stays disabled.
+- **designer (second pass): opencode-go/mimo-v2.6-pro (bare) → opencode-go/muse-spark-1.3-contributor (high)**
+  — fallback opencode-go/gpt-5.6-luna (high) unchanged. Gained: 4.14s route latency vs 39–49s
+  TTFAT, strongest design evidence (Arena WebDev splits, pelican-SVG), 45,300 req/5h. Lost:
+  verified AA at designer-usable effort (muse measured only at xhigh 45, v4.3.2 scale; high
+  unmeasured) and the privacy-clean profile (muse trains on prompts — accepted per Sep 24
+  decision). Recorded revert: opencode-go/mimo-v2.6-pro.
+- **oracle + council beta (second pass): no change** — mimo-v2.6-pro kept by user decision
+  (overthinking tax buys +4–19pts on hard tasks; tolerable in advisory/deliberative seats);
+  oracle fallback opencode-go/deepseek-v4-pro (high) unchanged.
+- Impact: glm-5.3-flash absent from every config position (was 4) — catalog revert if Z.ai
+  serving stabilizes; MiMo concentration 4 slots, new Muse concentration 3 slots; designer
+  escape hatch is its own fallback (opencode-go/gpt-5.6-luna). JSON validated after each
+  lane edit.
+
 ## 2026-09-26 — Watch-lane refresh + handyman lane removed
 
 Scope: watch-lane refresh (availability re-diffed via `opencode models opencode-go --verbose`
