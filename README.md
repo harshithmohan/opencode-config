@@ -20,7 +20,6 @@ This repo is the source of truth for my opencode configuration.
 config/
   opencode.json             Core config (plugins, permissions, agent disables)
   oh-my-opencode-slim.json  Agent/model roster for the oh-my-opencode-slim plugin
-  dcp.jsonc                 Dynamic context pruning settings (@tarquinen/opencode-dcp)
   tui.json                  TUI config — loads the tps-meter plugin and keybinds
 commands/
   model-refresh.md          /model-refresh command — refresh + benchmark-rank model roster
@@ -51,9 +50,9 @@ This copies `config/` into `~/.config/opencode/` and commands into `~/.config/op
 
 ## Plugins
 
-The config loads four plugins (installed automatically by opencode on first launch):
+The config loads three plugins (installed automatically by opencode on first launch):
 
-- **[`@tarquinen/opencode-dcp@latest`](https://github.com/Opencode-DCP/opencode-dynamic-context-pruning)** — dynamic context pruning. Automatically compresses/prunes stale conversation context to keep long sessions fast and within limits (configured via `config/dcp.jsonc`, `maxContextLimit: 150000`).
+- **[`opencode-acp@stable`](https://github.com/ranxianglei/opencode-acp)** — Active Context Pruning. Hands context-compression authority to the model via a three-tier compression architecture; replaces the old DCP plugin. Requires `compaction.auto: false`.
 - **[`opencode-handoff`](https://github.com/joshuadavidthomas/opencode-handoff)** — session handoff. Lets a session be handed off to a fresh one with a generated summary prompt, so work can continue without dragging the full history along.
 - **[`oh-my-opencode-slim`](https://github.com/alvinunreal/oh-my-opencode-slim)** — multi-agent workflow chain. Provides the specialist agents (orchestrator, oracle, explorer, librarian, designer, fixer, …) with per-agent model rosters and fallbacks defined in `config/oh-my-opencode-slim.json`.
 - **[`opencode-tps-meter@latest`](https://github.com/ChiR24/opencode-tps-meter)** — live tokens-per-second meter for the TUI. Loaded from `config/tui.json` along with custom keybinds (`ctrl+d`/`<leader>q` exit, `ctrl+c`/`escape` interrupt).
@@ -62,8 +61,8 @@ The config loads four plugins (installed automatically by opencode on first laun
 
 - **oh-my-opencode-slim** provides the agent chain with per-agent model rosters tuned in `oh-my-opencode-slim.json`.
 - **/model-refresh** is my periodic routine for checking available free models, benchmark-ranking them, and updating the roster — quality-first on critical lanes.
-- **DCP** keeps long sessions performant by pruning stale context (`maxContextLimit: 150000`).
 - **TPS meter** shows live tokens/sec in the TUI, a quick signal of route health and model responsiveness.
+- **ACP** handles context pruning; OpenCode built-in auto-compaction is disabled (`compaction.auto: false`) to avoid conflicts.
 - Built-in `explore` and `general` agents are disabled in favor of the slim chain.
 
 Config is maintained in this repo.

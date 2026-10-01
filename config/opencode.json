@@ -23,6 +23,7 @@
       "git rebase *": "ask",
       "git filter-branch": "ask",
       "git filter-branch *": "ask",
+      "git -C *": "deny",
       "rm *": "ask",
       "rmdir *": "ask",
       "shred *": "ask",
@@ -32,10 +33,13 @@
     }
   },
   "plugin": [
-    "@tarquinen/opencode-dcp@latest",
+    "opencode-acp",
     "opencode-handoff",
     "oh-my-opencode-slim"
   ],
+  "compaction": {
+    "auto": false
+  },
   "lsp": true,
   "formatter": true,
   "shell": "/bin/bash",
