@@ -1,40 +1,99 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "disabled_providers": [
-    "openrouter",
-    "anthropic"
-  ],
-  "permission": {
-    "edit": "ask",
-    "bash": {
-      "*": "allow",
-      "git commit": "ask",
-      "git commit *": "ask",
-      "git push": "ask",
-      "git push *": "ask",
-      "git reset": "ask",
-      "git reset *": "ask",
-      "git clean": "ask",
-      "git clean *": "ask",
-      "git checkout --*": "ask",
-      "git branch -D": "ask",
-      "git branch -D *": "ask",
-      "git rebase": "ask",
-      "git rebase *": "ask",
-      "git filter-branch": "ask",
-      "git filter-branch *": "ask",
-      "git -C *": "deny",
-      "rm *": "ask",
-      "rmdir *": "ask",
-      "shred *": "ask",
-      "mv *": "ask",
-      "find * -delete*": "ask",
-      "find * -exec*": "ask"
+  "permissions": [
+    {
+      "action": "edit",
+      "resource": "*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git commit *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git push *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git reset *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git clean *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git checkout --*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git branch -D *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git rebase *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git filter-branch *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git -C *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "rm *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "rmdir *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "shred *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "mv *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "find * -delete*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "find * -exec*",
+      "effect": "ask"
     }
+  ],
+  "websearch": {
+    "provider": "exa"
   },
-  "plugin": [
-    "opencode-acp",
-    "opencode-handoff",
+  "plugins": [
+    "@hadronomy/opencode-handoff-plugin",
+    "billion-context",
+    "@slkiser/opencode-quota",
     "oh-my-opencode-slim"
   ],
   "compaction": {
@@ -43,12 +102,12 @@
   "lsp": true,
   "formatter": true,
   "shell": "/bin/bash",
-  "agent": {
+  "agents": {
     "explore": {
-      "disable": true
+      "disabled": true
     },
     "general": {
-      "disable": true
+      "disabled": true
     }
   }
 }

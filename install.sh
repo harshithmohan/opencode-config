@@ -28,6 +28,11 @@ run() {
 run mkdir -p "$DEST/commands"
 run cp "$SRC/config/"* "$DEST/"
 run cp "$SRC/commands/"* "$DEST/commands/"
+# Copy subfolder configs (e.g. opencode-quota/)
+if [ -d "$SRC/config/opencode-quota" ]; then
+  run mkdir -p "$DEST/opencode-quota"
+  run cp "$SRC/config/opencode-quota/"* "$DEST/opencode-quota/"
+fi
 
 if [ "$DRY_RUN" -eq 1 ]; then
   echo "Dry run complete — no files were changed. Would install to $DEST"

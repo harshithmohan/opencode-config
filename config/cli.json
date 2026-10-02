@@ -1,0 +1,19 @@
+{
+  "$schema": "https://opencode.ai/v2/cli.json",
+  "keybinds": {
+    "app.exit": "ctrl+d,<leader>q",
+    "session.interrupt": "ctrl+c,escape"
+  },
+  "plugins": [
+    "opencode-tps-meter@latest"
+  ],
+  "diffs": {
+    "wrap": "word"
+  },
+  "session": {
+    "sidebar": "hide",
+    "scrollbar": true,
+    "thinking": "show"
+  },
+  "animations": true
+}
