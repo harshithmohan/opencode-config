@@ -87,15 +87,15 @@
       "effect": "ask"
     }
   ],
-  "websearch": {
-    "provider": "exa"
-  },
   "plugins": [
     "@hadronomy/opencode-handoff-plugin",
     "billion-context",
     "@slkiser/opencode-quota",
     "oh-my-opencode-slim"
   ],
+  "websearch": {
+    "provider": "exa"
+  },
   "compaction": {
     "auto": false
   },
