@@ -51,12 +51,13 @@ date on every write):
 
 **Freshness rules:**
 
-1. **Availability is never trusted from cache.** `opencode models` output is
-   re-run every refresh (cheap, local). The cached Availability Snapshot
-   exists only as the previous state to diff against.
+1. **Availability is never trusted from cache.** `opencode models` (model IDs)
+   and `opencode api GET /api/model` (capabilities + variants) are re-run every
+   refresh (cheap, local). The cached Availability Snapshot exists only as the
+   previous state to diff against.
 2. **Per-model research** (benchmarks, community, go-route) is reused when its
    `as-of` date is ≤30 days old AND the model is unchanged in the availability
-   diff. Re-research when: the model is new, its verbose output changed
+   diff. Re-research when: the model is new, its capability/variant output changed
    (variants, multiplier, multimodal), its entry is stale (>30 days), or it is
    being newly proposed for a lane it wasn't researched for.
 3. **Go-route reliability** must also be re-verified for any model currently
@@ -114,9 +115,10 @@ date on every write):
    rules apply.
 6. **Privacy**: Muse Spark Contributor SKUs may train on prompts — acceptable on ANY lane
    per user decision (Sep 24 2026); no lane restrictions apply.
-7. **Effort ceilings**: daily lanes are capped at `high`. `max`/`xhigh` variants
-   only for complex-task lanes: oracle (when a deep call warrants it) and council.
-   (The custom escalation agent was removed Sep 12 2026 — do not re-add it implicitly.)
+7. **Effort ceilings**: `max` is reserved for complex-task lanes: oracle (when a deep
+   call warrants it) and council. All other (daily) lanes may use up to `xhigh`;
+   `high` remains the default. (The custom escalation agent was removed Sep 12 2026 —
+   do not re-add it implicitly.)
 8. **Chains are 2-deep by default** — primary + one fallback.
 9. **No model names in prompt text**: agent `prompt`/`orchestratorPrompt` blocks
    must not name models.
@@ -137,20 +139,36 @@ date on every write):
 Load `MODEL_EVIDENCE_CACHE.md` first (create it if missing). Then:
 
 ```bash
-opencode models opencode-go --verbose
-opencode models --verbose
+# opencode v2.0.24 removed `opencode models --verbose` (and the positional
+# `<provider>` argument); `opencode models` now prints model IDs only.
+# Variants + input modalities come from the authenticated server API instead:
+opencode models
+opencode api GET /api/model
 ```
 
-- Every model referenced in the config must appear in this output; remove dead ones.
-- From each verbose block, record the `variants` map. Models with `{}` have no
-  variants and silently ignore variant settings.
-- Record multimodal capabilities (image/video input) per model — several lanes
+The API response is
+`{ location, data: [ { modelID, providerID, name, capabilities: { tools, input: [...], output: [...] }, variants: [ { id, settings } ] } ] }`.
+Filter it to one line per model with jq (already installed):
+
+```bash
+opencode api GET /api/model \
+  | jq -r '.data[] | select(.providerID=="opencode-go" or .providerID=="opencode")
+           | "\(.providerID)/\(.modelID): variants={\([.variants[].id]|join(","))} in=[\(.capabilities.input|join("+"))]"'
+```
+
+- Every model referenced in the config must appear in `opencode models` (and in
+  the API response); remove dead ones.
+- From the `variants` array, record each model's variant map. An empty array
+  means no variants exist and any variant setting is silently ignored.
+- Record multimodal capabilities (`capabilities.input`) per model — several lanes
   depend on them (librarian reads image-bearing docs; observer is the vision
   reader; deepseek-v4-flash is text-only).
-- **Diff this output against the cached Availability Snapshot** and classify
-  every model: `unchanged`, `changed` (variants/multimodal/multiplier/name
+- **Diff this against the cached Availability Snapshot** and classify every
+  model: `unchanged`, `changed` (variants/multimodal/multiplier/name
   differences), `new`, or `removed`. This classification drives what Step 3
   re-researches.
+- **Usage multipliers and req/5h burn rates are NOT in the API** — they live only
+  on the `/docs/go` page and are re-fetched in Step 2.
 
 ## Step 2 — Check quota economics
 
@@ -202,8 +220,8 @@ passes complete, with today's date as `as-of` and source links.**
 - Chain entries may be `"provider/model"` or `{ "id": "provider/model", "variant": "..." }`.
 - An agent-level `variant` applies to the whole chain; prefer explicit per-model
   objects when models in one chain need different efforts.
-- Effort ceilings per policy #7: `high` default everywhere; `max`/`xhigh` only on
-  oracle/council.
+- Effort ceilings per policy #7: `high` default everywhere; `max` reserved for
+  oracle/council, `xhigh` allowed on any lane.
 - Set variants only where the model's variant map has an entry.
 
 ## Step 5 — Per-lane review, confirm, apply
@@ -232,8 +250,12 @@ Work ONE decision lane at a time; the user confirms each before any edit:
    `node -e "JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'))" <config-path>`
 6. After the last lane: summary of keep-decisions (one line each) and changed
    lanes, final read-through of the config, full
-   end-state, and a watch-list of monitoring flags (latency unknowns, preview
-   expiries, shared premium quota).
+   end-state, and a watch-list of **re-checkable items only** — conditions the next
+   refresh must re-verify because they can change on their own: route flags
+   (open/clearing), serving/latency unknowns, preview expiries, new-SKU benchmark
+   gaps, and volatile quota facts (multipliers, ZDR windows, req/5h rows). Do **not**
+   put intrinsic model traits (e.g. a model's overthinking or supervised-worker
+   profile — these never change) or lane-slot concentration counts here.
 6. Tell the user: changes apply on the next OpenCode run; restart to apply now.
 
 ## Step 6 — Update MODEL_CHOICES.md, MODEL_CHANGELOG.md, and the cache
@@ -268,10 +290,12 @@ After the last lane is confirmed and applied, update the two docs (both live in
 
 ## Source of Truth
 
-The current `oh-my-opencode-slim.json` is the state to review, and
-`opencode models <provider> --verbose` output is the only authority on which
-models exist and which variants they support right now — both are always
-re-derived at the start of every refresh and never taken from cache.
+The current `oh-my-opencode-slim.json` is the state to review, and `opencode
+models` (model IDs) together with `opencode api GET /api/model` (capabilities +
+variants) are the only authority on which models exist and which variants they
+support right now — both are always re-derived at the start of every refresh and
+never taken from cache. (The CLI's `--verbose` flag, which used to print this,
+was removed in opencode v2.0.24.)
 
 Research **findings** (benchmarks, community reports, Go-route reliability,
 quota doc facts) are the exception: they may be reused from

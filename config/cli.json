@@ -5,7 +5,8 @@
     "session.interrupt": "ctrl+c,escape"
   },
   "plugins": [
-    "opencode-tps-meter@latest"
+    "opencode-tps-meter@latest",
+    "opencode-status-indicator"
   ],
   "diffs": {
     "wrap": "word"

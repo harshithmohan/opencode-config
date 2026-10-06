@@ -6,6 +6,52 @@ Append-only history of model assignment changes in
 "no changes" entries); `MODEL_CHOICES.md` holds the current rationale snapshot.
 Never rewrite or delete prior entries.
 
+## 2026-10-06 — full refresh (mimo-v2.6-pro leaves oracle; librarian/observer fallbacks de-free'd; xhigh opened to daily lanes)
+
+Scope: full `/model-refresh`, triggered by the user directive to move away from
+opencode-go/mimo-v2.6-pro ("It's thinking a lot in loops"). Availability diff vs Sep 27:
+opencode-go/glm-5.1 and opencode-go/kimi-k2.6 were removed from the catalog; the free
+opencode-go/space-bunny-free became the paid opencode-go/space-bunny ($0.15/$0.60, 3,130
+req/5h, $30/m cap, variants low→max) with a zen free sibling retaining the old SKU;
+qwen3.8-flash gained a `none` variant; six new zen free models appeared (big-pickle,
+fledge-alpha-free, ling-3.0-flash-fin-free, ling-3.1-flash-free, nemotron-3-ultra-free,
+nemotron-3.5-lightning-free) — none promoted. Quota re-fetch: new **Go Plus $40/mo** tier
+above the $10 Go plan; DeepSeek ZDR window extended to **Oct 31 2026**; deepseek-v4.1-flash's
+"4x · Ends Sep 27" multiplier expired → flat permanent 26,000 req/5h; no per-model multipliers
+anywhere in the catalog. Go-route re-verify: deepseek-v4-pro and qwen3.8-flash still flagged;
+**new** intermittent opaque 400 on deepseek-v4.1-flash (#51990); gpt-5.6-luna/gpt-6-luna clean.
+
+- **oracle: opencode-go/mimo-v2.6-pro → opencode-go/gpt-6-luna (xhigh)**; **fallback
+  opencode-go/deepseek-v4-pro (high) → opencode-go/muse-spark-1.3-contributor (xhigh)**.
+  Gained: a route-clean lead with a real effort ladder (mimo-pro runs bare and pays a 39–49s
+  time-to-first-answer overthinking tax) and a third-family (Meta-muse) fallback that no
+  longer depends on deepseek-v4-pro's unresolved Go-route tool-call flag. Lost: mimo-pro's
+  AA 46 ceiling and deepseek-v4-pro's strongest-verified correctness (TB2.1 87.9 / SWE 80.6 /
+  LCB 93.5) — both surrendered for route reliability; accepted the gpt-6-luna family overlap
+  with the orchestrator fallback.
+- **librarian: fallback opencode-go/longcat-2.5-preview-free (high) → opencode-go/deepseek-v4.1-flash (high)**
+  — primary opencode-go/muse-spark-1.3-contributor (high) unchanged. Gained: a route-clean
+  non-contributor rescue with image input and the config's fastest decode. Lost: the
+  zero-burn free fallback (longcat had an unverified ~Oct 9 expiry, zero benchmarks, and an
+  untested route — session choice was to run paid here).
+- **designer: both positions `high` → `xhigh`** — remains opencode-go/muse-spark-1.3-contributor
+  (xhigh) → opencode-go/gpt-5.6-luna (xhigh). Gained: runs the lead at the effort its AA 45
+  measurement was actually taken at (the `high` variant is unmeasured). Lost: some latency
+  headroom in an interactive lane.
+- **observer (dormant): fallback opencode-go/longcat-2.5-preview-free (high) → opencode-go/muse-spark-1.3-contributor (high)**
+  — primary opencode-go/mimo-v2.6-flash unchanged; observer stays disabled (orchestrator is
+  image-capable).
+- **council beta: opencode-go/mimo-v2.6-pro — unchanged** by explicit user decision
+  ("Keep mimo in council, it's fine"); its overthinking is acceptable in a deliberative seat.
+- **Policy #7 amended** in the `/model-refresh` command: `max` is now reserved for
+  oracle and council only; `xhigh` is allowed on any lane (`high` remains the default).
+
+Unchanged lanes: orchestrator (opencode-go/deepseek-v4.1-flash:high → opencode-go/gpt-6-luna:high),
+explorer (opencode-go/deepseek-v4.1-flash:high → opencode-go/mimo-v2.6-flash), fixer
+(opencode-go/deepseek-v4.1-flash:high → opencode-go/qwen3.8-flash:medium), council seats and
+synthesis (alpha deepseek-v4-pro, beta mimo-v2.6-pro, gamma muse-spark-1.3-contributor,
+synthesis gpt-5.6-luna:max).
+
 ## 2026-09-27 — full refresh + second pass (glm-5.3-flash demoted everywhere; longcat-2.5-preview-free added; designer → muse-spark-1.3)
 
 Scope: full refresh plus a targeted oracle/designer re-analysis. New model found:
