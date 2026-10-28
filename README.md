@@ -27,7 +27,8 @@ commands/
   model-refresh.md              /model-refresh command — refresh + benchmark-rank model roster
 MODEL_CHOICES.md               Why each agent runs the model it runs (pricing, benchmarks, fallback logic)
 MODEL_CHANGELOG.md             Append-only history of roster changes, one entry per /model-refresh run
-install.sh                     Installer for target systems
+install.sh                     Installer for target systems (macOS / Linux / WSL)
+install.ps1                    Installer for target systems (Windows PowerShell)
 ```
 
 ## Install
@@ -48,7 +49,23 @@ cd opencode-config
 ./install.sh
 ```
 
-This copies `config/` into `~/.config/opencode/` and commands into `~/.config/opencode/commands/`. It overwrites existing files with the same names — back up your config first if you have one. In particular, it replaces the plugin-generated `oh-my-opencode-slim.json` with this repo's roster, so run it after the plugin install.
+On Windows (PowerShell):
+
+```powershell
+git clone https://github.com/harshithmohan/opencode-config.git
+cd opencode-config
+.\install.ps1
+```
+
+Both installers accept a dry run — `./install.sh --dry-run` / `.\install.ps1 -DryRun` — which
+prints every copy without touching the filesystem. If PowerShell blocks the script with an
+execution-policy error, run it for the current session only:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+This copies `config/` into `~/.config/opencode/` and commands into `~/.config/opencode/commands/`. On Windows that resolves to `%USERPROFILE%\.config\opencode`. It overwrites existing files with the same names — back up your config first if you have one. In particular, it replaces the plugin-generated `oh-my-opencode-slim.json` with this repo's roster, so run it after the plugin install.
 
 ## Plugins
 
